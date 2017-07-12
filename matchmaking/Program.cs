@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
@@ -13,7 +14,14 @@ namespace matchmaking
             server.AddHandler(1, (token, stream, client) => Task.Run(() => {
                 var msgText = stream.ReadString();
                 Console.WriteLine(msgText);
-                server.Send(new Packet(1, token, Encoding.UTF8.GetBytes($"{msgText}\t OK")), client);
+                byte[] buffer;
+                using (var m = new MemoryStream()) {
+                    using (var writer = new BinaryWriter(m)) {
+                        writer.Write($"{msgText}\t OK");
+                    }
+                    buffer = m.ToArray();
+                }
+                server.Send(new Packet(1, token, buffer), client);
             }));
             server.StartListener().Wait();
         }

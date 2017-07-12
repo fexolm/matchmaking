@@ -53,25 +53,25 @@ namespace matchmaking
 
         private Task HandleConnectionAsync(TcpClient tcpClient) {
             return Task.Run(async () => {
-                using (var networkStream = tcpClient.GetStream()) {
-                    try {
-                        while (tcpClient.Connected) {
-                            while (tcpClient.Available > 0) {
-                                var stream = tcpClient.GetStream();
-                                using (var reader = new BinaryReader(stream)) {
-                                    int msgType = reader.ReadInt32();
-                                    string token = reader.ReadString();
-                                    Debug.Assert(_handlers.ContainsKey(msgType), $"_hanlers has key {msgType}");
-                                    await _handlers[msgType].Invoke(token, reader, tcpClient);
+                    using (var networkStream = tcpClient.GetStream()) {
+                        using (var reader = new BinaryReader(networkStream)) {
+                            try {
+                                while (tcpClient.Connected) {
+                                    while (tcpClient.Available > 0) {
+                                        int msgType = reader.ReadInt32();
+                                        string token = reader.ReadString();
+                                        Debug.Assert(_handlers.ContainsKey(msgType), $"_hanlers has key {msgType}");
+                                        await _handlers[msgType].Invoke(token, reader, tcpClient);
+                                    }
                                 }
+                            }
+                            catch (Exception e) {
+                                Console.WriteLine(e.Message);
                             }
                         }
                     }
-                    catch (Exception e) {
-                        Console.WriteLine(e.Message);
-                    }
                 }
-            });
+            );
         }
 
         public void AddHandler(int id, Handler handler) {
