@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -6,49 +7,81 @@ using System.Threading.Tasks;
 
 namespace matchmaking
 {
-    public class Server
-    {
-        private readonly TcpListener _listener;
-        private bool _isRinning = false;
+	public class Server
+	{
+		private readonly TcpListener _listener;
+		private readonly TcpClient _sender;
+		List<Task> _connectionTasks = new List<Task>();
+		object _lock = new Object();
 
-        public Server(int port) {
-            _listener = new TcpListener(IPAddress.Any, port);
-        }
+		public Server(int port)
+		{
+			_listener = TcpListener.Create(port);
+			_listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+			_sender = new TcpClient(new IPEndPoint(IPAddress.Any, port));
+			_sender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+		}
 
-        private async Task Listen() {
-            while (_isRinning) {
-                var client = await _listener.AcceptTcpClientAsync();
-                Task.Run(() => ProcessConnection(client));
-            }
-        }
+		public Task StartListener()
+		{
+			return Task.Run(async () =>
+			{
+				_listener.Start();
+				while (true)
+				{
+					var tcpClient = await _listener.AcceptTcpClientAsync();
+					Console.WriteLine("[Server] Client has connected");
+					var task = StartHandleConnectionAsync(tcpClient);
+					if (task.IsFaulted)
+						task.Wait();
+				}
+			});
+		}
 
-        private static void ProcessConnection(TcpClient client) {
-            var request = string.Empty;
-            var buffer = new byte[1024];
-            for (int count; (count = client.GetStream().Read(buffer, 0, buffer.Length)) > 0;) {
-                request += Encoding.UTF8.GetString(buffer, 0, count);
-            }
-            var response =
-                MessageArrived?.Invoke(
-                    request, (IPEndPoint) client.Client.RemoteEndPoint) ?? string.Empty;
-            buffer = Encoding.UTF8.GetBytes(response);
-            client.GetStream().Write(buffer, 0, buffer.Length);
-            client.Close();
-        }
+		private async Task StartHandleConnectionAsync(TcpClient tcpClient)
+		{
+			var connectionTask = HandleConnectionAsync(tcpClient);
+			lock (_lock)
+				_connectionTasks.Add(connectionTask);
+			try
+			{
+				await connectionTask;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+			}
+			finally
+			{
+				lock (_lock)
+					_connectionTasks.Remove(connectionTask);
+			}
+		}
 
-        public void BeginListen() {
-            _isRinning = true;
-            Task.Run(async () => await Listen());
-        }
+		private Task HandleConnectionAsync(TcpClient tcpClient)
+		{
+			return Task.Run(async () =>
+			{
+				using (var networkStream = tcpClient.GetStream())
+				{
+					while (tcpClient.Connected)
+					{
+						if (tcpClient.Available > 0)
+						{
+							var buffer = new byte[2048];
+							var byteCount = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+							await MessageArrived.Invoke(buffer, byteCount, tcpClient);
+						}
+					}
+				}
+			});
+		}
 
-        public void StopListen() {
-            _isRinning = false;
-        }
+		public event Func<byte[], int, TcpClient, Task> MessageArrived;
 
-        public static event Func<string, IPEndPoint, string> MessageArrived;
-
-        public void Send(byte[] msg, IPEndPoint endPoint) {
-            _listener.Server.SendTo(msg, endPoint);
-        }
-    }
+		public void Send(byte[] buffer, TcpClient client)
+		{
+			client.GetStream().Write(buffer, 0, buffer.Length);
+		}
+	}
 }
