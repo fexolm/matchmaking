@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,11 +10,11 @@ namespace matchmaking
     {
         public static void Main(string[] args) {
             var server = new Server(8001);
-            server.MessageArrived += (buf, len, client) => Task.Run(() => {
-                var msgText = Encoding.UTF8.GetString(buf, 0, len);
+            server.AddHandler(1, (token, stream, client) => Task.Run(() => {
+                var msgText = stream.ReadString();
                 Console.WriteLine(msgText);
-                server.Send(Encoding.UTF8.GetBytes($"{msgText}\t OK"), client);
-            });
+                server.Send(new Packet(1, token, Encoding.UTF8.GetBytes($"{msgText}\t OK")), client);
+            }));
             server.StartListener().Wait();
         }
     }

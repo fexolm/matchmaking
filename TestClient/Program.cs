@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TestClient
 {
@@ -14,12 +12,15 @@ namespace TestClient
             var tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, int.Parse(args[0])));
             tcpClient.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8000));
             while (true) {
-                tcpClient.Client.Send(Encoding.UTF8.GetBytes(Console.ReadLine()));
+                tcpClient.Client.Send(new Packet(1, "AGDFFE23423dsdf", Encoding.UTF8.GetBytes(Console.ReadLine()))
+                    .Serialize());
                 while (tcpClient.Available == 0) ;
                 var stream = tcpClient.GetStream();
-                var buffer = new byte[tcpClient.Available];
-                var msglen = stream.Read(buffer, 0, buffer.Length);
-                Console.WriteLine(Encoding.UTF8.GetString(buffer));
+                using (var reader = new BinaryReader(stream)) {
+                    reader.ReadInt32();
+                    reader.ReadString();
+                    Console.WriteLine(reader.ReadString());
+                }
             }
         }
     }

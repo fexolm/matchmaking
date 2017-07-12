@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -8,9 +9,13 @@ namespace matchmaking
 {
     public class Server
     {
+        public delegate Task Handler(string token, BinaryReader reader, TcpClient client);
+
         private readonly TcpListener _listener;
         private readonly List<Task> _connectionTasks = new List<Task>();
         private readonly object _lock = new object();
+
+        private readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
 
         public Server(int port) {
             _listener = TcpListener.Create(port);
@@ -49,20 +54,32 @@ namespace matchmaking
         private Task HandleConnectionAsync(TcpClient tcpClient) {
             return Task.Run(async () => {
                 using (var networkStream = tcpClient.GetStream()) {
-                    while (tcpClient.Connected) {
-                        if (tcpClient.Available <= 0) continue;
-                        var buffer = new byte[2048];
-                        var byteCount = await networkStream.ReadAsync(buffer, 0, buffer.Length);
-                        Debug.Assert(MessageArrived != null, "MessageArrived != null");
-                        await MessageArrived.Invoke(buffer, byteCount, tcpClient);
+                    try {
+                        while (tcpClient.Connected) {
+                            while (tcpClient.Available > 0) {
+                                var stream = tcpClient.GetStream();
+                                using (var reader = new BinaryReader(stream)) {
+                                    int msgType = reader.ReadInt32();
+                                    string token = reader.ReadString();
+                                    Debug.Assert(_handlers.ContainsKey(msgType), $"_hanlers has key {msgType}");
+                                    await _handlers[msgType].Invoke(token, reader, tcpClient);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
                     }
                 }
             });
         }
 
-        public event Func<byte[], int, TcpClient, Task> MessageArrived;
+        public void AddHandler(int id, Handler handler) {
+            _handlers.Add(id, handler);
+        }
 
-        public void Send(byte[] buffer, TcpClient client) {
+        public void Send(Packet packet, TcpClient client) {
+            var buffer = packet.Serialize();
             client.GetStream().Write(buffer, 0, buffer.Length);
         }
     }
