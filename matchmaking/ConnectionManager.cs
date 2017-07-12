@@ -23,7 +23,7 @@ namespace matchmaking
                 }
             }
         }
-        
+
         private void Add(string token, IPEndPoint connection) {
             _connectionFromToken[token] = connection;
             _tokenFromConnection[connection] = token;
