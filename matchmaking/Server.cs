@@ -1,16 +1,22 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace matchmaking
 {
-    public class Server
+    public class Server<TPlayer>
+        where TPlayer : Player, new()
     {
-        public delegate Task Handler(string token, string msg, TcpClient client);
+        public ConcurrentDictionary<string, TPlayer> _players =
+            new ConcurrentDictionary<string, TPlayer>();
+        
+        public delegate Task Handler(TPlayer player, List<string> parameters, TcpClient client);
 
         private readonly TcpListener _listener;
         private readonly object _lock = new object();
@@ -37,7 +43,7 @@ namespace matchmaking
 
         private async Task StartHandleConnectionAsync(TcpClient tcpClient) {
             var connectionTask = HandleConnectionAsync(tcpClient);
-              try {
+            try {
                 await connectionTask;
             }
             catch (Exception ex) {
@@ -55,8 +61,23 @@ namespace matchmaking
                                     Debug.Assert(_handlers.ContainsKey(1), $"_hanlers has key {1}");
                                     var buffer = new byte[available];
                                     networkStream.Read(buffer, 0, buffer.Length);
-                                    var msg = Encoding.UTF8.GetString(buffer);
-                                    await _handlers[1].Invoke("123", msg.TrimEnd('|'), tcpClient);
+                                    var msg = Encoding.UTF8.GetString(buffer).TrimEnd('|');
+                                    var parameters = msg.Split(' ').ToList();
+                                    var id = int.Parse(parameters[0]);
+                                    var token = parameters[1];
+                                    TPlayer player;
+                                    if (_players.ContainsKey(token)) {
+                                        player = _players[token];
+                                    }
+                                    else {
+                                        player = new TPlayer {
+                                            Token = token,
+                                            Client = tcpClient
+                                        };
+                                    }
+                                    parameters.RemoveAt(0);
+                                    parameters.RemoveAt(0);
+                                    await _handlers[id].Invoke(player, parameters, tcpClient);
                                 }
                             }
                         }
@@ -72,8 +93,9 @@ namespace matchmaking
             _handlers.Add(id, handler);
         }
 
-        public void Send(byte[] buffer, TcpClient client) {
-            client.GetStream().Write(buffer, 0, buffer.Length);
+        public void Send(Message<TPlayer> msg) {
+            var buffer = Encoding.UTF8.GetBytes($"{msg.Serialize()}|");
+            msg.Player.Client.GetStream().Write(buffer, 0, buffer.Length);
         }
     }
 }

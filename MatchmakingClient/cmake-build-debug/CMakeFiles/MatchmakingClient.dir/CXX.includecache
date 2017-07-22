@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/fexolm/git/matchmaking/MatchmakingClient/client.cpp
+client.h
+/home/fexolm/git/matchmaking/MatchmakingClient/client.h
+boost/algorithm/string.hpp
+-
+
+/home/fexolm/git/matchmaking/MatchmakingClient/client.h
+map
+-
+string
+-
+vector
+-
+functional
+-
+boost/asio.hpp
+-
+boost/array.hpp
+-
+
+/home/fexolm/git/matchmaking/MatchmakingClient/main.cpp
+iostream
+-
+client.h
+/home/fexolm/git/matchmaking/MatchmakingClient/client.h
+
+/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.cpp
+matchmaking_client.h
+/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
+
+/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
+string
+-
+functional
+-
+client.h
+/home/fexolm/git/matchmaking/MatchmakingClient/client.h
+
