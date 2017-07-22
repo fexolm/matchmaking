@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace matchmaking
 {
     public class Server
     {
-        public delegate Task Handler(string token, BinaryReader reader, TcpClient client);
+        public delegate Task Handler(string token, string msg, TcpClient client);
 
         private readonly TcpListener _listener;
-        private readonly List<Task> _connectionTasks = new List<Task>();
         private readonly object _lock = new object();
 
         private readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
@@ -37,37 +37,31 @@ namespace matchmaking
 
         private async Task StartHandleConnectionAsync(TcpClient tcpClient) {
             var connectionTask = HandleConnectionAsync(tcpClient);
-            lock (_lock)
-                _connectionTasks.Add(connectionTask);
-            try {
+              try {
                 await connectionTask;
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
-            }
-            finally {
-                lock (_lock)
-                    _connectionTasks.Remove(connectionTask);
             }
         }
 
         private Task HandleConnectionAsync(TcpClient tcpClient) {
             return Task.Run(async () => {
                     using (var networkStream = tcpClient.GetStream()) {
-                        using (var reader = new BinaryReader(networkStream)) {
-                            try {
-                                while (tcpClient.Connected) {
-                                    while (tcpClient.Available > 0) {
-                                        int msgType = reader.ReadInt32();
-                                        string token = reader.ReadString();
-                                        Debug.Assert(_handlers.ContainsKey(msgType), $"_hanlers has key {msgType}");
-                                        await _handlers[msgType].Invoke(token, reader, tcpClient);
-                                    }
+                        try {
+                            while (tcpClient.Connected) {
+                                int available;
+                                while ((available = tcpClient.Available) > 0) {
+                                    Debug.Assert(_handlers.ContainsKey(1), $"_hanlers has key {1}");
+                                    var buffer = new byte[available];
+                                    networkStream.Read(buffer, 0, buffer.Length);
+                                    var msg = Encoding.UTF8.GetString(buffer);
+                                    await _handlers[1].Invoke("123", msg.TrimEnd('|'), tcpClient);
                                 }
                             }
-                            catch (Exception e) {
-                                Console.WriteLine(e.Message);
-                            }
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine(e.Message);
                         }
                     }
                 }
@@ -78,8 +72,7 @@ namespace matchmaking
             _handlers.Add(id, handler);
         }
 
-        public void Send(Packet packet, TcpClient client) {
-            var buffer = packet.Serialize();
+        public void Send(byte[] buffer, TcpClient client) {
             client.GetStream().Write(buffer, 0, buffer.Length);
         }
     }
