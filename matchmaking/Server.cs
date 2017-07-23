@@ -15,7 +15,7 @@ namespace matchmaking
     {
         public ConcurrentDictionary<string, TPlayer> _players =
             new ConcurrentDictionary<string, TPlayer>();
-        
+
         public delegate Task Handler(TPlayer player, List<string> parameters, TcpClient client);
 
         private readonly TcpListener _listener;
@@ -74,6 +74,7 @@ namespace matchmaking
                                             Token = token,
                                             Client = tcpClient
                                         };
+                                        _players[token] = player;
                                     }
                                     parameters.RemoveAt(0);
                                     parameters.RemoveAt(0);

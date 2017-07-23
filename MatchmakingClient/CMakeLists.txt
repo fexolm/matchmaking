@@ -3,7 +3,7 @@ project(MatchmakingClient)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES main.cpp client.cpp client.h matchmaking_client.cpp matchmaking_client.h message_types.h message.h)
+set(SOURCE_FILES main.cpp client.cpp client.h matchmaking_client.cpp matchmaking_client.h message_types.h message.h responses.h room.h)
 
 find_package(Boost COMPONENTS system thread REQUIRED)
 

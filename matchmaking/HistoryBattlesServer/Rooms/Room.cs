@@ -1,4 +1,6 @@
-﻿namespace HistoryBattlesServer.Rooms
+﻿using System.Linq;
+
+namespace HistoryBattlesServer.Rooms
 {
     public class Room
     {
@@ -14,10 +16,15 @@
         public void Join(HBPlayer player) {
             Other = player;
         }
-        
-        //TODO: implement
+
         public string Serialize() {
-            return string.Empty;
+            return string.Join("-",
+                Owner.Token,
+                Params.Nickname,
+                Params.Map,
+                Params.Bet,
+                Params.Fraction,
+                Params.Rang);
         }
     }
 }

@@ -39,7 +39,8 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static void StartGame(HBPlayer player) {
-            gameStarted.Invoke(_rooms[player.RoomToken]);
+            Room removableRoom;
+            _rooms.TryRemove(player.RoomToken, out removableRoom);
         }
 
         public static bool IsInRoom(HBPlayer player) {
@@ -69,7 +70,7 @@ namespace HistoryBattlesServer.Rooms
             }
             return null;
         }
-        
+
         public static IEnumerable<Room> GetEmptyRooms() {
             return _rooms.Where(r => r.Value.Other == null).Select(r => r.Value);
         }
@@ -77,6 +78,5 @@ namespace HistoryBattlesServer.Rooms
         public static Action<HBPlayer, HBPlayer> playerJoined;
         public static Action<HBPlayer> opponentLeaved;
         public static Action<HBPlayer> roomClosed;
-        public static Action<Room> gameStarted;
     }
 }

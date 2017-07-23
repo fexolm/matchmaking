@@ -22,5 +22,6 @@ public:
     }
 };
 
+
 #endif //MATCHMAKINGCLIENT_MESSAGE_H
 

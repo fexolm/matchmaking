@@ -13,8 +13,8 @@ void matchmaking_client::show_rooms() {
     client::send(message(SHOW_ROOMS, token_));
 }
 
-void matchmaking_client::create_room() {
-    client::send(message(CREATE_ROOM, token_));
+void matchmaking_client::create_room(const create_room_request &request) {
+    client::send(message(CREATE_ROOM, token_, request.str()));
 }
 
 void matchmaking_client::join_room(const std::string &room_token) {

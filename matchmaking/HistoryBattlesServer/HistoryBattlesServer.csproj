@@ -53,6 +53,7 @@
     <Compile Include="Requests\Request.cs" />
     <Compile Include="Requests\ShowRoomsRequest.cs" />
     <Compile Include="Requests\StartGameRequest.cs" />
+    <Compile Include="Responses\PlayerJoinedResponse.cs" />
     <Compile Include="Responses\Response.cs" />
     <Compile Include="Responses\RoomListResult.cs" />
     <Compile Include="Responses\StartGameResponse.cs" />

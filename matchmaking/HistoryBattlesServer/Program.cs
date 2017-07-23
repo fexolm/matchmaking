@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Responses;
 using HistoryBattlesServer.Rooms;
@@ -73,16 +69,14 @@ namespace HistoryBattlesServer
                     s.Send(new RoomListResult(player, validationResult));
                 }
             }));
-
             RoomManager.opponentLeaved = (owner) => {
-                s.Send(new Message<HBPlayer>((int) MessageType.OPPONENT_LEAVED, owner));
+                s.Send(new Response((int) MessageType.OPPONENT_LEAVED, owner, Result.Ok));
             };
-
             RoomManager.playerJoined = (owner, oponent) => {
-                s.Send(new Message<HBPlayer>((int) MessageType.PLAYER_JOINED, owner));    
+                s.Send(new PlayerJoinedResponse(owner, Result.Ok, oponent.Token));
             };
             RoomManager.roomClosed = (opponent) => {
-                s.Send(new Message<HBPlayer>((int) MessageType.ROOM_CLOSED, opponent));
+                s.Send(new Response((int) MessageType.ROOM_CLOSED, opponent, Result.Ok));
             };
             s.StartListener().Wait();
         }

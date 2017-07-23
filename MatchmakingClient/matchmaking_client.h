@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 #include "client.h"
+#include "room.h"
 
 
 class matchmaking_client : public client {
@@ -21,7 +22,7 @@ public:
 
     void start_game();
 
-    void create_room();
+    void create_room(const create_room_request&);
 
     void join_room(const std::string &);
 
