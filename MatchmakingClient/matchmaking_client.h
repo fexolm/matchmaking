@@ -16,19 +16,32 @@ private:
     std::string token_;
 public:
     matchmaking_client(const std::string &token);
+
     void show_rooms();
+
     void start_game();
+
     void create_room();
+
     void join_room(const std::string &);
+
     void leave_room();
-    client::handler_t on_create_room;
-    client::handler_t on_show_rooms;
-    client::handler_t on_join_room;
-    client::handler_t on_leave_room;
-    client::handler_t on_game_started;
-    client::handler_t on_opponent_leaved;
-    client::handler_t on_room_closed;
-    client::handler_t on_player_joined;
+
+    void set_on_create_room(client::handler_t);
+
+    void set_on_show_rooms(client::handler_t);
+
+    void set_on_join_room(client::handler_t);
+
+    void set_on_leave_room(client::handler_t);
+
+    void set_on_game_started(client::handler_t);
+
+    void set_on_opponent_leaved(client::handler_t);
+
+    void set_on_room_closed(client::handler_t);
+
+    void set_on_player_joined(client::handler_t);
 };
 
 
