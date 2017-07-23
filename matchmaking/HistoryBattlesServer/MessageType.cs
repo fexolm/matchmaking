@@ -6,6 +6,9 @@
         JOIN_ROOM,
         LEAVE_ROOM,
         START_GAME,
-        SHOW_ROOMS
+        SHOW_ROOMS,
+        OPPONENT_LEAVED,
+        ROOM_CLOSED,
+        PLAYER_JOINED,
     }
 }

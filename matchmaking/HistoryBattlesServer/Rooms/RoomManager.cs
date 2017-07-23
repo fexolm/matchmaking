@@ -74,9 +74,9 @@ namespace HistoryBattlesServer.Rooms
             return _rooms.Where(r => r.Value.Other == null).Select(r => r.Value);
         }
 
-        public static Action<Player, Player> playerJoined;
-        public static Action<Player> opponentLeaved;
-        public static Action<Player> roomClosed;
+        public static Action<HBPlayer, HBPlayer> playerJoined;
+        public static Action<HBPlayer> opponentLeaved;
+        public static Action<HBPlayer> roomClosed;
         public static Action<Room> gameStarted;
     }
 }

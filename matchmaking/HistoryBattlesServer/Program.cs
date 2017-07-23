@@ -73,6 +73,18 @@ namespace HistoryBattlesServer
                     s.Send(new RoomListResult(player, validationResult));
                 }
             }));
+
+            RoomManager.opponentLeaved = (owner) => {
+                s.Send(new Message<HBPlayer>((int) MessageType.OPPONENT_LEAVED, owner));
+            };
+
+            RoomManager.playerJoined = (owner, oponent) => {
+                s.Send(new Message<HBPlayer>((int) MessageType.PLAYER_JOINED, owner));    
+            };
+            RoomManager.roomClosed = (opponent) => {
+                s.Send(new Message<HBPlayer>((int) MessageType.ROOM_CLOSED, opponent));
+            };
+            s.StartListener().Wait();
         }
     }
 }

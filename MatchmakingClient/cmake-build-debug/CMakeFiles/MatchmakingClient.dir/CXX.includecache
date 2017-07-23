@@ -25,14 +25,18 @@ boost/asio.hpp
 -
 boost/array.hpp
 -
+message.h
+/home/fexolm/git/matchmaking/MatchmakingClient/message.h
 
 /home/fexolm/git/matchmaking/MatchmakingClient/main.cpp
 iostream
 -
-client.h
-/home/fexolm/git/matchmaking/MatchmakingClient/client.h
+matchmaking_client.h
+/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
 
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.cpp
+message_types.h
+/home/fexolm/git/matchmaking/MatchmakingClient/message_types.h
 matchmaking_client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
 
@@ -43,4 +47,12 @@ functional
 -
 client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/client.h
+
+/home/fexolm/git/matchmaking/MatchmakingClient/message.h
+string
+-
+sstream
+-
+
+/home/fexolm/git/matchmaking/MatchmakingClient/message_types.h
 

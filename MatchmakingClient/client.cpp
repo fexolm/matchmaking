@@ -15,11 +15,12 @@ void client::connect(const std::string &ip, int port) {
     socket_.connect(endpoint);
 }
 
-void client::send(const std::string &msg) {
+void client::send(const message &msg) {
+    auto to_send = msg.get_value();
     boost::array<char, 512> buffer;
-    std::copy(msg.begin(), msg.end(), buffer.begin());
+    std::copy(to_send.begin(), to_send.end(), buffer.begin());
     boost::system::error_code error;
-    boost::asio::write(socket_, boost::asio::buffer(buffer, msg.length()), error);
+    boost::asio::write(socket_, boost::asio::buffer(buffer, to_send.length()), error);
 }
 
 void client::tick() {

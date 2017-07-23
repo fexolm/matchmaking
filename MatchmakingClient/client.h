@@ -10,6 +10,7 @@
 #include <functional>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include "message.h"
 
 using boost::asio::ip::tcp;
 
@@ -28,7 +29,7 @@ public:
 
     void connect(const std::string &ip, int port);
 
-    void send(const std::string &msg);
+    void send(const message &msg);
 
     void tick();
 
