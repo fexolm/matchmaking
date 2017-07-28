@@ -11,56 +11,49 @@ int main() {
     bool end = false;
     std::string command;
 
-    c.set_on_game_started([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        ip_response resp(params);
+    c.set_on_game_started([&c](const ip_response& resp) {
         if (resp.success()) {
             std::cout << "game started at " << resp.get_ip() << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_room_closed([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        response resp(params);
+    c.set_on_room_closed([&c](const response& resp) {
         if (resp.success()) {
             std::cout << "room closed" << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_opponent_leaved([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        response resp(params);
+    c.set_on_opponent_leaved([&c](const response& resp) {
         if (resp.success()) {
             std::cout << "opponent leaved " << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_leave_room([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        response resp(params);
+    c.set_on_leave_room([&c](const response& resp) {
         if (resp.success()) {
             std::cout << "successfully leaved " << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_join_room([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        response resp(params);
+    c.set_on_join_room([&c](const response& resp) {
         if (resp.success()) {
             std::cout << "successfully joined " << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_create_room([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        response resp(params);
+    c.set_on_create_room([&c](const response& resp) {
         if (resp.success()) {
             std::cout << "successfully created " << std::endl;
         } else {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_show_rooms([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        room_list_response resp(params);
+    c.set_on_show_rooms([&c](const room_list_response& resp) {
         if (resp.success()) {
             auto rooms = resp.get_rooms();
             for (auto iter = rooms.begin(); iter != rooms.end(); ++iter) {
@@ -70,8 +63,7 @@ int main() {
             std::cout << resp.get_error() << std::endl;
         }
     });
-    c.set_on_player_joined([&c](int id, const std::string &t, matchmaking_client::params_t params) {
-        token_response resp(params);
+    c.set_on_player_joined([&c](const token_response& resp) {
         if (resp.success()) {
             std::cout << "player joined " << resp.get_token() << std::endl;
         } else {
