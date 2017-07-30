@@ -1,4 +1,5 @@
-﻿using HistoryBattlesServer.Requests;
+﻿using System.Threading.Tasks;
+using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Rooms;
 using matchmaking;
 
@@ -14,6 +15,13 @@ namespace HistoryBattlesServer.ExternalServices
         }
     }
 
+    public class IpResponse
+    {
+        public string Ip { get; set; }
+
+        public bool Success { get; set; }
+    }
+
     public static class ApiService
     {
         //TODO: change master ip
@@ -24,30 +32,10 @@ namespace HistoryBattlesServer.ExternalServices
             return Result.Ok;
         }
 
-        //TODO: implement
-        public static ValueResult<IpString> GetRemoteServerIp(Room room) {
-            var response = WebService.Post(MASTER_IP, GetJsonromRoom(room));
-            if (IsSuccess(response)) {
-                return new ValueResult<IpString>(GetIpFromResponse(response));
-            }
-            return new ValueResult<IpString>(GetErrorFromResponse(response));
-        }
-
-        //TODO: implement
-        private static string GetJsonromRoom(Room room) {
-            return string.Empty;
-        }
-
-        private static bool IsSuccess(string response) {
-            return true;
-        }
-
-        private static IpString GetIpFromResponse(string response) {
-            return new IpString(MASTER_IP);
-        }
-
-        private static string GetErrorFromResponse(string error) {
-            return "Some error";
+        //TODO: test
+        public static async Task<ValueResult<IpString>> GetRemoteServerIp(Room room) {
+            var response = await WebService.Post<Room, IpResponse>(MASTER_IP, room);
+            return new ValueResult<IpString>(new IpString(response.Ip));
         }
     }
 }
