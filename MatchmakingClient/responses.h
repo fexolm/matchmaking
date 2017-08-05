@@ -16,12 +16,12 @@
 
 class response : public message {
 private:
-    std::string status_;
+    bool success_;
     std::string error_message_;
 public:
 
     bool success() const {
-        return status_ == "OK";
+        return success_;
     }
 
     std::string get_error() const {
@@ -30,8 +30,8 @@ public:
 
     virtual void deserialize(const boost::property_tree::ptree &pt) override {
         message::deserialize(pt);
-        status_ = pt.get<std::string>("Status");
-        error_message_ = pt.get<std::string>("ErrorMessage");
+        success_ = pt.get<bool>("Result.Success");
+        error_message_ = pt.get<std::string>("Result.ErrorMessage");
     }
 };
 
@@ -46,7 +46,9 @@ public:
 
     virtual void deserialize(const boost::property_tree::ptree &pt) override {
         response::deserialize(pt);
-        ip_ = pt.get<std::string>("Ip");
+        if (success()) {
+            ip_ = pt.get<std::string>("Result.Value");
+        }
     }
 };
 
@@ -60,7 +62,7 @@ public:
 
     virtual void deserialize(const boost::property_tree::ptree &pt) override {
         response::deserialize(pt);
-        token_ = pt.get<std::string>("Token");
+        token_ = pt.get<std::string>("Result.Value");
     }
 };
 
@@ -74,8 +76,9 @@ public:
 
     virtual void deserialize(const boost::property_tree::ptree &pt) override {
         response::deserialize(pt);
+        int count = pt.get<int>("Count");
         //@formatter:off
-        BOOST_FOREACH(const boost::property_tree::ptree::value_type &tree_node_value, pt.get_child("Rooms")) {
+        BOOST_FOREACH(const boost::property_tree::ptree::value_type &tree_node_value, pt.get_child("Result.Value")) {
             const boost::property_tree::ptree subtree = (boost::property_tree::ptree) tree_node_value.second;
             rooms_.push_back(room(subtree));
         }

@@ -30,12 +30,12 @@ public:
             rang_(rang) {}
 
     room(const boost::property_tree::ptree &pt) :
-            token_(pt.get<std::string>("Room.Token")),
-            nickname_(pt.get<std::string>("Room.Nockname")),
-            map_(pt.get<std::string>("Room.Map")),
-            bet_(pt.get<std::string>("Room.Bet")),
-            fraction_(pt.get<std::string>("Room.Fraction")),
-            rang_(pt.get<std::string>("Room.Rang")) {
+            token_(pt.get<std::string>("Owner.Token")),
+            nickname_(pt.get<std::string>("Params.Nickname")),
+            map_(pt.get<std::string>("Params.Map")),
+            bet_(pt.get<std::string>("Params.Bet")),
+            fraction_(pt.get<std::string>("Params.Fraction")),
+            rang_(pt.get<std::string>("Params.Rang")) {
     }
 
     std::string get_token() const {
@@ -63,11 +63,11 @@ public:
     }
 
     void serialize_to(boost::property_tree::ptree &pt) const {
-        pt.put("Room.Nickname", nickname_);
-        pt.put("Room.Map", map_);
-        pt.put("Room.Bet", bet_);
-        pt.put("Room.Fraction", fraction_);
-        pt.put("Room.Rang", rang_);
+        pt.put("RoomParams.Nickname", nickname_);
+        pt.put("RoomParams.Map", map_);
+        pt.put("RoomParams.Bet", bet_);
+        pt.put("RoomParams.Fraction", fraction_);
+        pt.put("RoomParams.Rang", rang_);
     }
 };
 

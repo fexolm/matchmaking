@@ -17,6 +17,7 @@ void message::deserialize(const boost::property_tree::ptree &pt) {
 boost::property_tree::ptree message::serialize() {
     boost::property_tree::ptree pt;
     pt.put("Id", id_);
+    return pt;
 }
 
 message::~message() {

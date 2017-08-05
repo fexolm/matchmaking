@@ -6,7 +6,7 @@ int main() {
     std::string token;
     std::cin >> token;
     matchmaking_client c(token);
-    c.connect("127.0.0.1", 8001);
+    c.connect("192.168.0.102", 8001);
     bool end = false;
     std::string command;
 
