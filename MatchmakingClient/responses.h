@@ -9,26 +9,16 @@
 #include <string>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
+#include <iostream>
 #include "client.h"
 #include "room.h"
 
-class response {
+class response : public message {
 private:
-    client::params_t params;
     std::string status_;
     std::string error_message_;
 public:
-    response(const client::params_t &params) :
-            params(params),
-            status_(params[0]) {
-        if (status_ == "ERROR") {
-            std::stringstream sstream;
-            for (auto iter = params.begin() + 1; iter != params.end(); ++iter) {
-                sstream << *iter << " ";
-            }
-            error_message_ = sstream.str();
-        }
-    }
 
     bool success() const {
         return status_ == "OK";
@@ -38,6 +28,11 @@ public:
         return error_message_;
     }
 
+    virtual void deserialize(const boost::property_tree::ptree &pt) override {
+        message::deserialize(pt);
+        status_ = pt.get<std::string>("Status");
+        error_message_ = pt.get<std::string>("ErrorMessage");
+    }
 };
 
 
@@ -45,14 +40,13 @@ class ip_response : public response {
 private:
     std::string ip_;
 public:
-    ip_response(const client::params_t &params) : response(params) {
-        if (success()) {
-            ip_ = std::stoi(params[1]);
-        }
-    }
-
     std::string get_ip() const {
         return ip_;
+    }
+
+    virtual void deserialize(const boost::property_tree::ptree &pt) override {
+        response::deserialize(pt);
+        ip_ = pt.get<std::string>("Ip");
     }
 };
 
@@ -60,14 +54,13 @@ class token_response : public response {
 private:
     std::string token_;
 public:
-    token_response(const client::params_t &params) : response(params) {
-        if (success()) {
-            token_ = params[1];
-        }
-    }
-
     std::string get_token() const {
         return token_;
+    }
+
+    virtual void deserialize(const boost::property_tree::ptree &pt) override {
+        response::deserialize(pt);
+        token_ = pt.get<std::string>("Token");
     }
 };
 
@@ -75,19 +68,18 @@ class room_list_response : public response {
 private:
     std::vector<room> rooms_;
 public:
-    room_list_response(const client::params_t &params) : response(params) {
-        if (success()) {
-            for (auto iter = params.begin() + 1; iter != params.end(); ++iter) {
-                client::params_t res;
-                boost::algorithm::split(res, *iter, boost::algorithm::is_any_of("-"));
-                room r(res);
-                rooms_.push_back(r);
-            }
-        }
-    }
-
     std::vector<room> get_rooms() const {
         return rooms_;
+    }
+
+    virtual void deserialize(const boost::property_tree::ptree &pt) override {
+        response::deserialize(pt);
+        //@formatter:off
+        BOOST_FOREACH(const boost::property_tree::ptree::value_type &tree_node_value, pt.get_child("Rooms")) {
+            const boost::property_tree::ptree subtree = (boost::property_tree::ptree) tree_node_value.second;
+            rooms_.push_back(room(subtree));
+        }
+        //@formatter:on
     }
 };
 

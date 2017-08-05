@@ -2,11 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace matchmaking
 {
@@ -16,7 +15,7 @@ namespace matchmaking
         public ConcurrentDictionary<string, TPlayer> _players =
             new ConcurrentDictionary<string, TPlayer>();
 
-        public delegate Task Handler(TPlayer player, List<string> parameters, TcpClient client);
+        public delegate Task Handler(TPlayer player, Message<TPlayer> msg, TcpClient client);
 
         private readonly TcpListener _listener;
         private readonly object _lock = new object();
@@ -58,27 +57,26 @@ namespace matchmaking
                             while (tcpClient.Connected) {
                                 int available;
                                 while ((available = tcpClient.Available) > 0) {
-                                    Debug.Assert(_handlers.ContainsKey(1), $"_hanlers has key {1}");
                                     var buffer = new byte[available];
                                     networkStream.Read(buffer, 0, buffer.Length);
-                                    var msg = Encoding.UTF8.GetString(buffer).TrimEnd('|');
-                                    var parameters = msg.Split(' ').ToList();
-                                    var id = int.Parse(parameters[0]);
-                                    var token = parameters[1];
-                                    TPlayer player;
-                                    if (_players.ContainsKey(token)) {
-                                        player = _players[token];
+                                    var fullMsg = Encoding.UTF8.GetString(buffer);
+                                    while (!string.IsNullOrEmpty(fullMsg)) {
+                                        var msg = ReadOneJson(ref fullMsg);
+                                        var msgObj = JsonConvert.DeserializeObject<Message<TPlayer>>(msg);
+                                        TPlayer player;
+                                        if (_players.ContainsKey(msgObj.Player.Token)) {
+                                            player = _players[msgObj.Player.Token];
+                                        }
+                                        else {
+                                            player = new TPlayer {
+                                                Token = msgObj.Player.Token,
+                                                Client = tcpClient
+                                            };
+                                            _players[msgObj.Player.Token] = player;
+                                        }
+                                        Debug.Assert(_handlers.ContainsKey(msgObj.Id), $"_hanlers has key {msgObj.Id}");
+                                        await _handlers[msgObj.Id].Invoke(player, msgObj, tcpClient);
                                     }
-                                    else {
-                                        player = new TPlayer {
-                                            Token = token,
-                                            Client = tcpClient
-                                        };
-                                        _players[token] = player;
-                                    }
-                                    parameters.RemoveAt(0);
-                                    parameters.RemoveAt(0);
-                                    await _handlers[id].Invoke(player, parameters, tcpClient);
                                 }
                             }
                         }
@@ -90,12 +88,27 @@ namespace matchmaking
             );
         }
 
+        private string ReadOneJson(ref string str) {
+            int bracketsCount = 0;
+            int i = 0;
+            do {
+                if (str[i] == '{') bracketsCount++;
+                if (str[i] == '}') bracketsCount--;
+                i++;
+            } while (bracketsCount > 0);
+            var res = str.Substring(0, i);
+            str = i == str.Length
+                ? string.Empty
+                : str.Substring(i, str.Length);
+            return res;
+        }
+
         public void AddHandler(int id, Handler handler) {
             _handlers.Add(id, handler);
         }
 
         public void Send(Message<TPlayer> msg) {
-            var buffer = Encoding.UTF8.GetBytes($"{msg.Serialize()}|");
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
             msg.Player.Client.GetStream().Write(buffer, 0, buffer.Length);
         }
     }

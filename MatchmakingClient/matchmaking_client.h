@@ -31,7 +31,7 @@ public:
 
     void start_game();
 
-    void create_room(const create_room_request &);
+    void create_room(const room &);
 
     void join_room(const std::string &);
 
@@ -52,6 +52,8 @@ public:
     void set_on_room_closed(response_handler_t);
 
     void set_on_player_joined(token_response_handler_t);
+
+    virtual void send(const boost::property_tree::ptree &pt) override;
 };
 
 

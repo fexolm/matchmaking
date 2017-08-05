@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace HistoryBattlesServer.Rooms
+﻿namespace HistoryBattlesServer.Rooms
 {
     public class Room
     {

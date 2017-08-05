@@ -17,6 +17,10 @@ CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../matchmaking_client
 CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../matchmaking_client.h
 CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../message.h
 CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../message_types.h
+CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../request.h
 CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../responses.h
 CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o: ../room.h
+
+CMakeFiles/MatchmakingClient.dir/message.cpp.o: ../message.cpp
+CMakeFiles/MatchmakingClient.dir/message.cpp.o: ../message.h
 

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Security.Policy;
-using matchmaking;
 
 namespace HistoryBattlesServer.Rooms
 {
@@ -35,12 +32,16 @@ namespace HistoryBattlesServer.Rooms
             var room = _rooms[player.RoomToken];
             room.Other = null;
             opponentLeaved.Invoke(room.Owner);
-            player.RoomToken = string.Empty;
+            room.Owner.RoomToken = string.Empty;
+            if (room.Other != null) {
+                room.Other.RoomToken = string.Empty;
+            }
         }
 
-        public static void StartGame(HBPlayer player) {
+        public static Room RemoveRoom(string roomToken) {
             Room removableRoom;
-            _rooms.TryRemove(player.RoomToken, out removableRoom);
+            _rooms.TryRemove(roomToken, out removableRoom);
+            return removableRoom;
         }
 
         public static bool IsInRoom(HBPlayer player) {
@@ -65,10 +66,9 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static Room GetRoomInfo(string roomToken) {
-            if (_rooms.ContainsKey(roomToken)) {
-                return _rooms[roomToken];
-            }
-            return null;
+            return _rooms.ContainsKey(roomToken)
+                ? _rooms[roomToken]
+                : null;
         }
 
         public static IEnumerable<Room> GetEmptyRooms() {

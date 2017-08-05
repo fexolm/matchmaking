@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/MatchmakingClient.dir/main.cpp.o"
   "CMakeFiles/MatchmakingClient.dir/client.cpp.o"
   "CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o"
+  "CMakeFiles/MatchmakingClient.dir/message.cpp.o"
   "MatchmakingClient.pdb"
   "MatchmakingClient"
 )

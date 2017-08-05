@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using matchmaking;
 
 namespace HistoryBattlesServer.Requests
@@ -8,8 +7,6 @@ namespace HistoryBattlesServer.Requests
     {
         protected Request(int id, HBPlayer player) : base(id, player) { }
 
-        public abstract void Deserialize(List<string> parameters);
-
         public abstract Result Valdate();
 
         public abstract Result Process();
@@ -17,8 +14,8 @@ namespace HistoryBattlesServer.Requests
 
     public class Result
     {
-        public readonly bool Success;
-        public readonly string ErrorMessage;
+        public bool Success { get; protected set; }
+        public string ErrorMessage { get; protected set; }
 
         public Result(string errorMessage) {
             ErrorMessage = errorMessage;
@@ -34,12 +31,21 @@ namespace HistoryBattlesServer.Requests
 
     public class ValueResult<TValue> : Result
     {
-        public readonly TValue Value;
+        public TValue Value { get; private set; }
+
+        protected ValueResult() { }
 
         public ValueResult(TValue val) {
             Value = val;
         }
 
         public ValueResult(string errorMessage) : base(errorMessage) { }
+
+        public static ValueResult<TValue> BuildResult(bool success, TValue value) {
+            return new ValueResult<TValue> {
+                Success = success,
+                Value = value
+            };
+        }
     }
 }

@@ -18,5 +18,9 @@ CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o
  /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
  /home/fexolm/git/matchmaking/MatchmakingClient/message.h
  /home/fexolm/git/matchmaking/MatchmakingClient/message_types.h
+ /home/fexolm/git/matchmaking/MatchmakingClient/request.h
  /home/fexolm/git/matchmaking/MatchmakingClient/responses.h
  /home/fexolm/git/matchmaking/MatchmakingClient/room.h
+CMakeFiles/MatchmakingClient.dir/message.cpp.o
+ /home/fexolm/git/matchmaking/MatchmakingClient/message.cpp
+ /home/fexolm/git/matchmaking/MatchmakingClient/message.h

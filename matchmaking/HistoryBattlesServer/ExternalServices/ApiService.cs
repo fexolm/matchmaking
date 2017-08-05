@@ -1,31 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using HistoryBattlesServer.ExternalServices.Models;
 using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Rooms;
 using matchmaking;
+using StartGameRequest = HistoryBattlesServer.ExternalServices.Models.StartGameRequest;
 
 namespace HistoryBattlesServer.ExternalServices
 {
-    //because ValueResult<string> is not possible
-    public class IpString
-    {
-        public readonly string Ip;
-
-        public IpString(string ip) {
-            Ip = ip;
-        }
-    }
-
-    public class IpResponse
-    {
-        public string Ip { get; set; }
-
-        public bool Success { get; set; }
-    }
-
     public static class ApiService
     {
         //TODO: change master ip
-        private const string MASTER_IP = "192.168.0.1";
+        private const string MASTER_IP = "http://104.199.106.137:8000";
+
+        //TODO: change private key
+        private const string PRIVATE_KEY = "12345";
 
         //TODO: implement
         public static Result ValidateRoomParams(RoomParams roomParams, Player player) {
@@ -33,9 +21,19 @@ namespace HistoryBattlesServer.ExternalServices
         }
 
         //TODO: test
-        public static async Task<ValueResult<IpString>> GetRemoteServerIp(Room room) {
-            var response = await WebService.Post<Room, IpResponse>(MASTER_IP, room);
-            return new ValueResult<IpString>(new IpString(response.Ip));
+        public static ValueResult<string> GetRemoteServerIp(Room room) {
+            try {
+                var responseData = WebService.Post<IpResponse, StartGameRequest>(
+                    $"{MASTER_IP}/start_game/",
+                    new StartGameRequest(PRIVATE_KEY, room));
+                if (!responseData.success) {
+                    return new ValueResult<string>(responseData.error);
+                }
+                return ValueResult<string>.BuildResult(true, responseData.ip);
+            }
+            catch (Exception ex) {
+                return new ValueResult<string>(ex.ToString());
+            }
         }
     }
 }

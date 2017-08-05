@@ -10,14 +10,18 @@
 #include <functional>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include "message.h"
 
 using boost::asio::ip::tcp;
 
 class client {
 public:
+    typedef boost::property_tree::ptree ptree_t;
     typedef std::vector<std::string> params_t;
-    typedef std::function<void(int id, const std::string &token, params_t params)> handler_t;
+    typedef std::function<void(int id, const ptree_t &)> handler_t;
 
 private:
     boost::asio::io_service ios_;
@@ -27,17 +31,17 @@ public:
 
     client();
 
-    void connect(const std::string &ip, int port);
+    virtual void connect(const std::string &ip, int port);
 
-    void send(const message &msg);
+    virtual void send(const ptree_t &);
 
-    void tick();
+    virtual void tick();
 
     virtual ~client();
 
-    void disconnect();
+    virtual void disconnect();
 
-    void add_handler(int id, handler_t handler);
+    virtual void add_handler(int id, handler_t handler);
 };
 
 

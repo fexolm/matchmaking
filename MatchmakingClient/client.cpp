@@ -3,7 +3,6 @@
 //
 
 #include "client.h"
-#include <boost/algorithm/string.hpp>
 
 client::client() :
         ios_(),
@@ -15,30 +14,51 @@ void client::connect(const std::string &ip, int port) {
     socket_.connect(endpoint);
 }
 
-void client::send(const message &msg) {
-    auto to_send = msg.get_value();
+void client::send(const ptree_t &pt) {
+    std::ostringstream oss;
+    boost::property_tree::json_parser::write_json(oss, pt);
+    std::string to_send = oss.str();
     boost::array<char, 512> buffer;
     std::copy(to_send.begin(), to_send.end(), buffer.begin());
     boost::system::error_code error;
     boost::asio::write(socket_, boost::asio::buffer(buffer, to_send.length()), error);
 }
 
+
+std::string read_one_json(std::string &str) {
+    const static std::string EMPTY_STR = "";
+    int brackets_count = 0;
+    int i = 0;
+    do {
+        if (str[i] == '{') brackets_count++;
+        if (str[i] == '}') brackets_count--;
+        i++;
+    } while (brackets_count > 0);
+
+    std::string result = str.substr(0, i);
+    if (i == str.length()) {
+        str = EMPTY_STR;
+    } else {
+        str = str.substr(i, str.length());
+    }
+    return result;
+}
+
 void client::tick() {
     if (socket_.available()) {
-        boost::asio::streambuf buffer;
-        boost::system::error_code error;
-        size_t len = boost::asio::read_until(socket_, buffer, '|', error);
-        std::stringstream message_stream;
-        message_stream.write(boost::asio::buffer_cast<const char *>(buffer.data()), len);
-        auto msg = message_stream.str();
-        msg.pop_back();
-        client::params_t full_params;
-        boost::algorithm::split(full_params, msg, boost::algorithm::is_any_of(" "));
-        int id = std::stoi(full_params[0]);
-        std::string token = full_params[1];
-        client::params_t params(full_params.size() - 2);
-        std::copy(full_params.begin()+2, full_params.end(), params.begin());
-        handlers_[id](id, token, params);
+        boost::array<char, 1024> buf;
+        size_t len = socket_.read_some(boost::asio::buffer(buf));
+        std::string msgFull;
+        std::copy(buf.begin(), buf.end(), std::back_inserter(msgFull));
+
+        while (msgFull.length() > 0) {
+            std::string msg = read_one_json(msgFull);
+            std::istringstream st(msg);
+            boost::property_tree::ptree pt;
+            boost::property_tree::read_json(st, pt);
+            int id = pt.get<int>("Id");
+            handlers_[id](id, pt);
+        }
     }
 }
 

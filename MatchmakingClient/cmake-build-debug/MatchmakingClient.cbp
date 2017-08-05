@@ -97,10 +97,16 @@
 		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h">
 			<Option target="MatchmakingClient"/>
 		</Unit>
+		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/message.cpp">
+			<Option target="MatchmakingClient"/>
+		</Unit>
 		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/message.h">
 			<Option target="MatchmakingClient"/>
 		</Unit>
 		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/message_types.h">
+			<Option target="MatchmakingClient"/>
+		</Unit>
+		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/request.h">
 			<Option target="MatchmakingClient"/>
 		</Unit>
 		<Unit filename="/home/fexolm/git/matchmaking/MatchmakingClient/responses.h">

@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/fexolm/git/matchmaking/MatchmakingClient/client.cpp" "/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/MatchmakingClient.dir/client.cpp.o"
   "/home/fexolm/git/matchmaking/MatchmakingClient/main.cpp" "/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/MatchmakingClient.dir/main.cpp.o"
   "/home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.cpp" "/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.o"
+  "/home/fexolm/git/matchmaking/MatchmakingClient/message.cpp" "/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/MatchmakingClient.dir/message.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

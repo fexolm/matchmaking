@@ -204,6 +204,33 @@ matchmaking_client.cpp.s:
 	$(MAKE) -f CMakeFiles/MatchmakingClient.dir/build.make CMakeFiles/MatchmakingClient.dir/matchmaking_client.cpp.s
 .PHONY : matchmaking_client.cpp.s
 
+message.o: message.cpp.o
+
+.PHONY : message.o
+
+# target to build an object file
+message.cpp.o:
+	$(MAKE) -f CMakeFiles/MatchmakingClient.dir/build.make CMakeFiles/MatchmakingClient.dir/message.cpp.o
+.PHONY : message.cpp.o
+
+message.i: message.cpp.i
+
+.PHONY : message.i
+
+# target to preprocess a source file
+message.cpp.i:
+	$(MAKE) -f CMakeFiles/MatchmakingClient.dir/build.make CMakeFiles/MatchmakingClient.dir/message.cpp.i
+.PHONY : message.cpp.i
+
+message.s: message.cpp.s
+
+.PHONY : message.s
+
+# target to generate assembly for a file
+message.cpp.s:
+	$(MAKE) -f CMakeFiles/MatchmakingClient.dir/build.make CMakeFiles/MatchmakingClient.dir/message.cpp.s
+.PHONY : message.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -222,6 +249,9 @@ help:
 	@echo "... matchmaking_client.o"
 	@echo "... matchmaking_client.i"
 	@echo "... matchmaking_client.s"
+	@echo "... message.o"
+	@echo "... message.i"
+	@echo "... message.s"
 .PHONY : help
 
 

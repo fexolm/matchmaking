@@ -4,24 +4,27 @@
 
 #ifndef MATCHMAKINGCLIENT_MESSAGE_H
 #define MATCHMAKINGCLIENT_MESSAGE_H
-#include <string>
-#include <sstream>
 
+#include <string>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 class message {
 private:
-    std::string msg_string_;
+    int id_;
 public:
-    explicit message(int id, std::string token, std::string msg_params = "") {
-        std::stringstream fmt;
-        fmt << id << " " << token << " " << msg_params << '|';
-        msg_string_ = fmt.str();
-    }
-    std::string get_value() const {
-        return msg_string_;
-    }
-};
+    message();
 
+    message(int id);
+
+    int get_id() const;
+
+    virtual void deserialize(const boost::property_tree::ptree &);
+
+    virtual boost::property_tree::ptree serialize();
+
+    virtual ~message();
+};
 
 #endif //MATCHMAKINGCLIENT_MESSAGE_H
 

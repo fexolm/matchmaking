@@ -6,15 +6,11 @@ namespace HistoryBattlesServer.Requests
 {
     public class JoinRoomRequest : Request
     {
-        private string _roomToken;
-        public JoinRoomRequest(HBPlayer player) : base((int)MessageType.JOIN_ROOM, player) { }
-
-        public override void Deserialize(List<string> parameters) {
-            _roomToken = parameters[0];
-        }
+        public string RoomToken { get; set; }
+        public JoinRoomRequest(HBPlayer player) : base((int) MessageType.JOIN_ROOM, player) { }
 
         public override Result Valdate() {
-            var room = RoomManager.GetRoomInfo(_roomToken);
+            var room = RoomManager.GetRoomInfo(RoomToken);
             if (room == null) {
                 return new Result("Room not exist");
             }
@@ -27,7 +23,7 @@ namespace HistoryBattlesServer.Requests
         }
 
         public override Result Process() {
-            RoomManager.JoinRoom(Player, _roomToken);
+            RoomManager.JoinRoom(Player, RoomToken);
             return Result.Ok;
         }
     }

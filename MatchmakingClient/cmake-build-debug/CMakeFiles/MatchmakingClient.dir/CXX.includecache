@@ -9,8 +9,6 @@
 /home/fexolm/git/matchmaking/MatchmakingClient/client.cpp
 client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/client.h
-boost/algorithm/string.hpp
--
 
 /home/fexolm/git/matchmaking/MatchmakingClient/client.h
 map
@@ -25,6 +23,12 @@ boost/asio.hpp
 -
 boost/array.hpp
 -
+boost/algorithm/string.hpp
+-
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/json_parser.hpp
+-
 message.h
 /home/fexolm/git/matchmaking/MatchmakingClient/message.h
 
@@ -35,14 +39,14 @@ boost/thread.hpp
 -
 matchmaking_client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
-responses.h
-/home/fexolm/git/matchmaking/MatchmakingClient/responses.h
 
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.cpp
 message_types.h
 /home/fexolm/git/matchmaking/MatchmakingClient/message_types.h
 matchmaking_client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
+request.h
+/home/fexolm/git/matchmaking/MatchmakingClient/request.h
 
 /home/fexolm/git/matchmaking/MatchmakingClient/matchmaking_client.h
 string
@@ -56,13 +60,23 @@ room.h
 responses.h
 /home/fexolm/git/matchmaking/MatchmakingClient/responses.h
 
+/home/fexolm/git/matchmaking/MatchmakingClient/message.cpp
+message.h
+/home/fexolm/git/matchmaking/MatchmakingClient/message.h
+
 /home/fexolm/git/matchmaking/MatchmakingClient/message.h
 string
 -
-sstream
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/json_parser.hpp
 -
 
 /home/fexolm/git/matchmaking/MatchmakingClient/message_types.h
+
+/home/fexolm/git/matchmaking/MatchmakingClient/request.h
+message.h
+/home/fexolm/git/matchmaking/MatchmakingClient/message.h
 
 /home/fexolm/git/matchmaking/MatchmakingClient/responses.h
 map
@@ -72,6 +86,10 @@ string
 sstream
 -
 boost/algorithm/string.hpp
+-
+boost/foreach.hpp
+-
+iostream
 -
 client.h
 /home/fexolm/git/matchmaking/MatchmakingClient/client.h
