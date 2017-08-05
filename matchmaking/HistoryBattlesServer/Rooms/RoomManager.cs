@@ -18,7 +18,9 @@ namespace HistoryBattlesServer.Rooms
         public static void CloseRoom(HBPlayer player) {
             Room room;
             _rooms.TryRemove(player.Token, out room);
-            roomClosed.Invoke(room.Other);
+			if(RoomFull(player)) { 
+				roomClosed.Invoke(room.Other);
+			}
             player.RoomToken = string.Empty;
         }
 

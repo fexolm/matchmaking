@@ -5,8 +5,13 @@ using HistoryBattlesServer.Rooms;
 
 namespace HistoryBattlesServer.Responses
 {
-    public class RoomListResult : Response
-    {
-        public RoomListResult(HBPlayer player, Result result) : base((int) MessageType.SHOW_ROOMS, player, result) { }    
-    }
+	public class RoomListResult : Response
+	{
+		public int Count {
+			get {
+				return ((ValueResult<IEnumerable<Room>>)Result).Value.Count();
+			}
+		}
+		public RoomListResult(HBPlayer player, Result result) : base((int)MessageType.SHOW_ROOMS, player, result) { }
+	}
 }
