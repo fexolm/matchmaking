@@ -1,3 +1,0 @@
-/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/fexolm/git/matchmaking/MatchmakingClient/cmake-build-debug/CMakeFiles/MatchmakingClient.dir
