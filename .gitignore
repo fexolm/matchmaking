@@ -5,6 +5,7 @@ MatchmakingServer/bin
 MatchmakingServer/.vs
 MatchmakingServer/obj
 MatchmakingClient/cmake-build-debug
+packages/
 *.out
 *.exe
 *.dll
