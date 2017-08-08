@@ -38,7 +38,10 @@ namespace FootballServer
                     if (_invites.ContainsKey(request.Token))
                     {
                         _invites[request.Token].Status = InviteStatus.ACCEPTED;
-                        server.Send(new InviteAcceptedResult(Token.Generate(), _invites[request.Token].From));
+                        Token token = Token.Generate();
+                        server.Send(new InviteAcceptedResult(token, _invites[request.Token].From));
+                        server.Send(new InviteAcceptedResult(token, _invites[request.Token].To));
+                        _invites[request.Token] = null;
                     }
                     else
                     {
@@ -53,6 +56,7 @@ namespace FootballServer
                     {
                         _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
                         server.Send(new InviteDeclinedResult(_invites[request.Invite.Token]));
+                        _invites[request.Token] = null;
                     }
                     else
                     {
@@ -68,6 +72,7 @@ namespace FootballServer
                         _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
                         server.Send(new InviteDeclinedResult(_invites[request.Invite.Token]));
                         server.Send(new InviteRejectedResult(_invites[request.Invite.Token]));
+                        _invites[request.Token] = null;
                     }
                     else
                     {
