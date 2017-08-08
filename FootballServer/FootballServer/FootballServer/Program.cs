@@ -19,12 +19,12 @@ namespace FootballServer
             server.AddHandler((int)MessageType.CREATE_INVITE,
                 (player, msg, client) => Task.Run(() =>
             {
-                var request = msg.ToObject<TokenRequest>();
+                var request = msg.ToObject<ValueRequest<Token>>();
                 if (server._players.ContainsKey(request.Token.ToString()))
                 {
                     Invite inv = new Invite(Token.Generate(), player, server._players[request.Token.ToString()]);
                     _invites[inv.Token] = inv;
-                    server.Send(new InviteRecievedResult(inv));
+                    server.Send(new ValueResult<Invite>((int)MessageType.CREATE_INVITE, inv.To, inv));
                 }
                 else
                 {
@@ -34,14 +34,15 @@ namespace FootballServer
             server.AddHandler((int)MessageType.ACCEPT_INVITE,
                 (player, msg, client) => Task.Run(() =>
                 {
-                    var request = msg.ToObject<TokenRequest>();
+                    var request = msg.ToObject<ValueRequest<Token>>();
                     if (_invites.ContainsKey(request.Token))
                     {
                         _invites[request.Token].Status = InviteStatus.ACCEPTED;
-                        Token token = Token.Generate();
-                        server.Send(new InviteAcceptedResult(token, _invites[request.Token].From));
-                        server.Send(new InviteAcceptedResult(token, _invites[request.Token].To));
-                        _invites[request.Token] = null;
+                        server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
+                            _invites[request.Token].To, Token.Generate()));
+                        server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
+                            _invites[request.Token].From, Token.Generate()));
+                        _invites.TryRemove(request.Token, _invites[request.Token]);
                     }
                     else
                     {
@@ -51,12 +52,13 @@ namespace FootballServer
             server.AddHandler((int)MessageType.DECLINE_INVITE,
                 (player, msg, client) => Task.Run(() =>
                 {
-                    var request = msg.ToObject<InviteDeclinedRequest>();
+                    var request = msg.ToObject<ValueRequest<Invite>>();
                     if (_invites.ContainsKey(request.Invite.Token))
                     {
                         _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
-                        server.Send(new InviteDeclinedResult(_invites[request.Invite.Token]));
-                        _invites[request.Token] = null;
+                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                            _invites[request.Invite.Token].From, _invites[request.Invite.Token]));
+                        _invites.TryRemove(request.Token, _invites[request.Token]);
                     }
                     else
                     {
@@ -66,13 +68,15 @@ namespace FootballServer
             server.AddHandler((int)MessageType.REJECT_INVITE,
                 (player, msg, client) => Task.Run(() =>
                 {
-                    var request = msg.ToObject<InviteDeclinedRequest>();
+                    var request = msg.ToObject<ValueRequest<Invite>>();
                     if (_invites.ContainsKey(request.Invite.Token))
                     {
                         _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
-                        server.Send(new InviteDeclinedResult(_invites[request.Invite.Token]));
-                        server.Send(new InviteRejectedResult(_invites[request.Invite.Token]));
-                        _invites[request.Token] = null;
+                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                            _invites[request.Invite.Token].From, _invites[request.Invite.Token]));
+                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                            _invites[request.Invite.Token].To, _invites[request.Invite.Token]));
+                        _invites.TryRemove(request.Token, _invites[request.Token]);
                     }
                     else
                     {
