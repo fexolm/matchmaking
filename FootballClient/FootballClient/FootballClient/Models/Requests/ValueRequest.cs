@@ -1,7 +1,10 @@
-﻿namespace FootballClient.Models.Requests
+﻿using Newtonsoft.Json;
+
+namespace FootballClient.Models.Requests
 {
     class ValueRequest<TValue> : Request
     {
+        [JsonProperty]
         public TValue Value { get; set; }
 
         // id - message type

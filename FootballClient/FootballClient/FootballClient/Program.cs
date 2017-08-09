@@ -15,27 +15,40 @@ namespace FootballClient
             client.Connect(IPAddress.Parse("127.0.0.1"), 8001);
 
             client.AddHandler((int)MessageType.CREATE_INVITE,
-                (player, msg, response) => Task.Run(() =>
+                (msg) => Task.Run(() =>
                 {
-                    client.Send(new ValueRequest<Token>((int)MessageType.CREATE_INVITE,
-                        client.Get(), client.Get().Token));
+                client.Send(new ValueRequest<Token>(Convert.ToInt32(MessageType.CREATE_INVITE),
+                    client.Get(), client.Get().Token));
                 }));
             client.AddHandler((int)MessageType.ACCEPT_INVITE,
-                (player, msg, response) => Task.Run(() =>
+                (msg) => Task.Run(() =>
                 {
                     var result = msg.ToObject<ValueResult<Invite>>();
+                    client.Send(new ValueRequest<Token>((int)MessageType.ACCEPT_INVITE,
+                        client.Get(), client.Get().Token));
 
                 }));
             client.AddHandler((int)MessageType.DECLINE_INVITE,
-                (player, msg, response) => Task.Run(() =>
+                (msg) => Task.Run(() =>
                 {
-
+                    var result = msg.ToObject<ValueResult<Invite>>();
+                    client.Send(new ValueRequest<Token>((int)MessageType.DECLINE_INVITE,
+                        client.Get(), client.Get().Token));
+                    
                 }));
-            client.AddHandler((int)MessageType.REJECT_INVITE,
-                (player, msg, response) => Task.Run(() =>
+            while (true)
+            {
+                try
                 {
-
-                }));
+                    Console.Write("Write a command: ");
+                    client._handlers[Convert.ToInt32(Console.ReadLine())]
+                        (new Newtonsoft.Json.Linq.JObject());
+                }
+                catch
+                {
+                    Console.WriteLine("wrong command");
+                }
+            }
         }
     }
 }

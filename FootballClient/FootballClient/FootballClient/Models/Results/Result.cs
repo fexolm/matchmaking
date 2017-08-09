@@ -1,6 +1,4 @@
-﻿using matchmaking;
-
-namespace FootballClient.Models.Results
+﻿namespace FootballClient.Models.Results
 {
     class Result : Message<Player>
     {

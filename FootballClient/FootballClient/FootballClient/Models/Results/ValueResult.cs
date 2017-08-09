@@ -1,9 +1,10 @@
-﻿using matchmaking;
+﻿using Newtonsoft.Json;
 
 namespace FootballClient.Models.Results
 {
     class ValueResult<TValue> : Result
     {
+        [JsonProperty]
         public TValue Value { get; set; }
 
         // id - message type

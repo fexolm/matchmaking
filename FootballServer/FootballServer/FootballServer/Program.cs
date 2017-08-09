@@ -20,9 +20,9 @@ namespace FootballServer
                 (player, msg, client) => Task.Run(() =>
             {
                 var request = msg.ToObject<ValueRequest<Token>>();
-                if (server._players.ContainsKey(request.Token.ToString()))
+                if (server._players.ContainsKey(request.Value.ToString()))
                 {
-                    Invite inv = new Invite(Token.Generate(), player, server._players[request.Token.ToString()]);
+                    Invite inv = new Invite(Token.Generate(), player, server._players[request.Value.ToString()]);
                     _invites[inv.Token] = inv;
                     server.Send(new ValueResult<Invite>((int)MessageType.CREATE_INVITE, inv.To, inv));
                 }
@@ -35,14 +35,15 @@ namespace FootballServer
                 (player, msg, client) => Task.Run(() =>
                 {
                     var request = msg.ToObject<ValueRequest<Token>>();
-                    if (_invites.ContainsKey(request.Token))
+                    if (_invites.ContainsKey(request.Value))
                     {
-                        _invites[request.Token].Status = InviteStatus.ACCEPTED;
+                        _invites[request.Value].Status = InviteStatus.ACCEPTED;
+                        Invite inv = _invites[request.Value];
                         server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
-                            _invites[request.Token].To, Token.Generate()));
+                            inv.To, Token.Generate()));
                         server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
-                            _invites[request.Token].From, Token.Generate()));
-                        _invites.TryRemove(request.Token, _invites[request.Token]);
+                            inv.From, Token.Generate()));
+                        _invites.TryRemove(request.Value, out inv);
                     }
                     else
                     {
@@ -53,12 +54,13 @@ namespace FootballServer
                 (player, msg, client) => Task.Run(() =>
                 {
                     var request = msg.ToObject<ValueRequest<Invite>>();
-                    if (_invites.ContainsKey(request.Invite.Token))
+                    if (_invites.ContainsKey(request.Value.Token))
                     {
-                        _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
+                        _invites[request.Value.Token].Status = InviteStatus.REJECTED;
+                        Invite inv = _invites[request.Value.Token];
                         server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
-                            _invites[request.Invite.Token].From, _invites[request.Invite.Token]));
-                        _invites.TryRemove(request.Token, _invites[request.Token]);
+                            inv.From, inv));
+                        _invites.TryRemove(request.Value.Token, out inv);
                     }
                     else
                     {
@@ -69,21 +71,24 @@ namespace FootballServer
                 (player, msg, client) => Task.Run(() =>
                 {
                     var request = msg.ToObject<ValueRequest<Invite>>();
-                    if (_invites.ContainsKey(request.Invite.Token))
+                    if (_invites.ContainsKey(request.Value.Token))
                     {
-                        _invites[request.Invite.Token].Status = InviteStatus.REJECTED;
+                        _invites[request.Value.Token].Status = InviteStatus.REJECTED;
+                        Invite inv = _invites[request.Value.Token];
                         server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
-                            _invites[request.Invite.Token].From, _invites[request.Invite.Token]));
+                            inv.From, inv));
                         server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
-                            _invites[request.Invite.Token].To, _invites[request.Invite.Token]));
-                        _invites.TryRemove(request.Token, _invites[request.Token]);
+                            inv.To, inv));
+                        _invites.TryRemove(request.Value.Token, out inv);
                     }
                     else
                     {
                         server.Send(new ErrorResult("Invite is not valid", player));
                     }
                 }));
+            System.Console.WriteLine("starting to listen...");
             server.StartListener().Wait();
+            System.Console.WriteLine("end");
         }
     }
 

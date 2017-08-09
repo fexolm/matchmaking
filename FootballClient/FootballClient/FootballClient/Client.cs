@@ -14,12 +14,13 @@ namespace FootballClient
     {
         private Player _client { get; set; }
 
-        public delegate Task Handler(TPlayer player, JObject msg, MessageType response);
+        public delegate Task Handler(JObject msg);
 
-        private readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
+        public readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
 
         public Client()
         {
+            _client = new Player();
             _client.Client = new TcpClient();
             _client.Token = Token.Generate();
 
@@ -75,7 +76,7 @@ namespace FootballClient
         {
             var m = JsonConvert.SerializeObject(msg);
             var buffer = Encoding.UTF8.GetBytes(m);
-            msg.Player.Client.GetStream().Write(buffer, 0, buffer.Length);
+            _client.Client.GetStream().Write(buffer, 0, buffer.Length);
         }
 
         public Player Get()

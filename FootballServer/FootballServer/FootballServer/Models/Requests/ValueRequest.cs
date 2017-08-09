@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using matchmaking;
+﻿using matchmaking;
+using Newtonsoft.Json;
 
 namespace FootballServer.Models.Requests
 {
     class ValueRequest<TValue> : Request
     {
+        [JsonProperty]
         public TValue Value { get; set; }
 
         // id - message type
