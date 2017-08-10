@@ -4,10 +4,10 @@ namespace FootballClient
 {
     public class Player
     {
-        public Token Token { get; set; }
+        public string Token { get; set; }
         internal TcpClient Client { get; set; }
 
-        public Player(Token token, TcpClient client)
+        public Player(string token, TcpClient client)
         {
             Token = token;
             Client = client;

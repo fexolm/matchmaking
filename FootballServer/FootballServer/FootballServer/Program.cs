@@ -24,7 +24,7 @@ namespace FootballServer
                 {
                     Invite inv = new Invite(Token.Generate(), player, server._players[request.Value.ToString()]);
                     _invites[inv.Token] = inv;
-                    server.Send(new ValueResult<Invite>((int)MessageType.CREATE_INVITE, inv.To, inv));
+                    server.Send(new ValueResult<Invite>((int)MessageType.RECIEVED_INVITE, inv.To, inv));
                 }
                 else
                 {

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using FootballClient.Models.Requests;
+using FootballClient.Models.Results;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -11,9 +13,9 @@ namespace FootballClient
 {
     class Client
     {
-        internal readonly TcpClient _client;
+        protected readonly TcpClient _client;
 
-        internal readonly Token _token;
+        protected readonly Token _token;
 
         public delegate Task Handler(JObject msg);
 
@@ -54,7 +56,14 @@ namespace FootballClient
 
         public void Connect(IPAddress ip, int port)
         {
-            _client.Client.Connect(new IPEndPoint(ip, port));
+            try
+            {
+                _client.Client.Connect(new IPEndPoint(ip, port));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public void Disconnect()
@@ -67,9 +76,18 @@ namespace FootballClient
             _handlers.TryAdd(id, handler);
         }
 
-        public void Send(Message msg)
+        public void Send(int id)
         {
-            var m = JsonConvert.SerializeObject(msg);
+            var m = JsonConvert.SerializeObject(
+                new Message(id, new Player(_token.ToString(), _client)));
+            var buffer = Encoding.UTF8.GetBytes(m);
+            _client.GetStream().Write(buffer, 0, buffer.Length);
+        }
+
+        public void Send<TValue>(int id, TValue Value)
+        {
+            var m = JsonConvert.SerializeObject(
+                new ValueRequest<TValue>(id, new Player(_token.ToString(), _client), Value));
             var buffer = Encoding.UTF8.GetBytes(m);
             _client.GetStream().Write(buffer, 0, buffer.Length);
         }

@@ -1,40 +1,65 @@
 ﻿using FootballClient.Enums;
-using FootballClient.Models.Requests;
 using FootballClient.Models.Results;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace FootballClient
 {
     class MMClient : Client
     {
+        private ConcurrentDictionary<Player, Invite> _invites =
+            new ConcurrentDictionary<Player, Invite>();
+
+        public Action<Invite> OnInviteRecieved;
+
+        public Action<Invite> OnInviteRejected;
+
+        public Action<Invite> OnInviteAccepted;
+
+        public Action<string> OnInviteError;
+
         public MMClient(Token token) : base(token)
         {
-            AddHandler((int)MessageType.CREATE_INVITE,
+            AddHandler((int)MessageType.RECIEVED_INVITE,
                 (msg) => Task.Run(() =>
                 {
-                    Send(new ValueRequest<Token>((int)MessageType.CREATE_INVITE,
-                        new Player(_token, _client), _token));
+                    var result = msg.ToObject<ValueResult<Invite>>();
+                    OnInviteRecieved(result.Value);
                 }));
             AddHandler((int)MessageType.ACCEPT_INVITE,
                 (msg) => Task.Run(() =>
                 {
                     var result = msg.ToObject<ValueResult<Invite>>();
-                    Send(new ValueRequest<Token>((int)MessageType.ACCEPT_INVITE,
-                        new Player(_token, _client), _token));
-
+                    OnInviteAccepted(result.Value);
                 }));
             AddHandler((int)MessageType.DECLINE_INVITE,
                 (msg) => Task.Run(() =>
                 {
                     var result = msg.ToObject<ValueResult<Invite>>();
-                    Send(new ValueRequest<Token>((int)MessageType.DECLINE_INVITE,
-                        new Player(_token, _client), _token));
-
+                    OnInviteRejected(result.Value);
                 }));
+            AddHandler((int)MessageType.ERROR,
+                (msg) => Task.Run(() =>
+                {
+                    var result = msg.ToObject<ErrorResult>();
+                    OnInviteError(result.ErrorMessage);
+                }));
+        }
+
+        public void CreateInvite(Token token)
+        {
+            Send((int)MessageType.CREATE_INVITE, _token);
+        }
+
+        public void AcceptInvite(Invite invite)
+        {
+            Send((int)MessageType.ACCEPT_INVITE, invite);
+        }
+
+        public void DeclineInvite(Invite invite)
+        {
+            Send((int)MessageType.DECLINE_INVITE, invite);
         }
     }
 }
