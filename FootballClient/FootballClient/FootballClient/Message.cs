@@ -1,12 +1,11 @@
 ﻿namespace FootballClient
 {
-    public class Message<TPlayer>
-        where TPlayer : Player
+    public class Message
     {
         public readonly int Id;
-        public TPlayer Player { get; set; }
+        public Player Player { get; set; }
 
-        public Message(int id, TPlayer player) {
+        public Message(int id, Player player) {
             Id = id;
             Player = player;
         }

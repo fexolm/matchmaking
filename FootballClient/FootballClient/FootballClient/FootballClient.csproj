@@ -50,6 +50,7 @@
     <Compile Include="Enums\MessageType.cs" />
     <Compile Include="Invite.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="MMClient.cs" />
     <Compile Include="Models\Requests\Request.cs" />
     <Compile Include="Models\Requests\ValueRequest.cs" />
     <Compile Include="Models\Results\ErrorResult.cs" />

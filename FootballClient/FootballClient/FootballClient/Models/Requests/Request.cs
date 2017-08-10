@@ -1,6 +1,6 @@
 ﻿namespace FootballClient.Models.Requests
 {
-    class Request : Message<Player>
+    class Request : Message
     {
         public Request(int id, Player player) : base(id, player)
         {

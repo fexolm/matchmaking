@@ -1,7 +1,7 @@
-﻿using FootballClient.Enums;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -9,40 +9,69 @@ using System.Threading.Tasks;
 
 namespace FootballClient
 {
-    class Client<TPlayer>
-        where TPlayer : Player, new()
+    class Client
     {
-        private Player _client { get; set; }
+        internal readonly TcpClient _client;
+
+        internal readonly Token _token;
 
         public delegate Task Handler(JObject msg);
 
-        public readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
+        public readonly ConcurrentDictionary<int, Handler> _handlers =
+            new ConcurrentDictionary<int, Handler>();
 
-        public Client()
+        public Client(Token token)
         {
-            _client = new Player();
-            _client.Client = new TcpClient();
-            _client.Token = Token.Generate();
+            _client = new TcpClient();
+            _token = token;
+        }
 
-            int available;
-            if ((available = _client.Client.Available) > 0)
+        public void Tick()
+        {
+            try
             {
-                var networkStream = _client.Client.GetStream();
-                var buffer = new byte[available];
-                networkStream.Read(buffer, 0, buffer.Length);
-                var fullMsg = Encoding.UTF8.GetString(buffer);
-                while (!string.IsNullOrEmpty(fullMsg))
+                var networkStream = _client.GetStream();
+                int available;
+                while ((available = _client.Available) > 0)
                 {
-                    var msg = ReadOneJson(ref fullMsg);
-                    var msgObj = JObject.FromObject(JsonConvert.DeserializeObject(msg));
+                    var buffer = new byte[available];
+                    networkStream.Read(buffer, 0, buffer.Length);
+                    var fullMsg = Encoding.UTF8.GetString(buffer);
+                    while (!string.IsNullOrEmpty(fullMsg))
+                    {
+                        var msg = ReadOneJson(ref fullMsg);
+                        var msgObj = JObject.FromObject(JsonConvert.DeserializeObject(msg));
+                        var m = msgObj.ToObject<Message>();
+                        _handlers[m.Id].Invoke(msgObj);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
         public void Connect(IPAddress ip, int port)
         {
-
             _client.Client.Connect(new IPEndPoint(ip, port));
+        }
+
+        public void Disconnect()
+        {
+            _client.GetStream().Dispose();
+        }
+
+        public void AddHandler(int id, Handler handler)
+        {
+            _handlers.TryAdd(id, handler);
+        }
+
+        public void Send(Message msg)
+        {
+            var m = JsonConvert.SerializeObject(msg);
+            var buffer = Encoding.UTF8.GetBytes(m);
+            _client.GetStream().Write(buffer, 0, buffer.Length);
         }
 
         private static string ReadOneJson(ref string str)
@@ -67,21 +96,11 @@ namespace FootballClient
             return res;
         }
 
-        public void AddHandler(int id, Handler handler)
+        ~Client()
         {
-            _handlers.Add(id, handler);
-        }
-
-        public void Send(Message<TPlayer> msg)
-        {
-            var m = JsonConvert.SerializeObject(msg);
-            var buffer = Encoding.UTF8.GetBytes(m);
-            _client.Client.GetStream().Write(buffer, 0, buffer.Length);
-        }
-
-        public Player Get()
-        {
-            return _client;
+            Disconnect();
+            _client.Close();
+            _handlers.Clear();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FootballClient.Models.Results
 {
-    class Result : Message<Player>
+    class Result : Message
     {
         public Result(int id, Player player) : base(id, player)
         {

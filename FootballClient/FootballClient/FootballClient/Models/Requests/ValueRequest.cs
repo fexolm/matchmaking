@@ -4,6 +4,8 @@ namespace FootballClient.Models.Requests
 {
     class ValueRequest<TValue> : Request
     {
+        private Token _token;
+
         [JsonProperty]
         public TValue Value { get; set; }
 
