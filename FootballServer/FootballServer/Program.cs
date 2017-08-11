@@ -22,7 +22,7 @@ namespace FootballServer
                 var request = msg.ToObject<ValueRequest<Token>>();
                 if (server._players.ContainsKey(request.Value.ToString()))
                 {
-                    Invite inv = new Invite(Token.Generate(), player, server._players[request.Value.ToString()]);
+                    var inv = new Invite(Token.Generate(), player, server._players[request.Value.ToString()]);
                     _invites[inv.Token] = inv;
                     server.Send(new ValueResult<Invite>((int)MessageType.RECIEVED_INVITE, inv.To, inv));
                 }
@@ -38,7 +38,7 @@ namespace FootballServer
                     if (_invites.ContainsKey(request.Value))
                     {
                         _invites[request.Value].Status = InviteStatus.ACCEPTED;
-                        Invite inv = _invites[request.Value];
+                        var inv = _invites[request.Value];
                         var token = Token.Generate();
                         server.Send(new ValueResult<Token>((int)MessageType.ACCEPT_INVITE,
                             inv.To, token));
@@ -58,7 +58,7 @@ namespace FootballServer
                     if (_invites.ContainsKey(request.Value.Token))
                     {
                         _invites[request.Value.Token].Status = InviteStatus.REJECTED;
-                        Invite inv = _invites[request.Value.Token];
+                        var inv = _invites[request.Value.Token];
                         server.Send(new ValueResult<Invite>((int)MessageType.REJECT_INVITE,
                             inv.From, inv));
                         _invites.TryRemove(request.Value.Token, out inv);
@@ -75,7 +75,7 @@ namespace FootballServer
                     if (_invites.ContainsKey(request.Value.Token))
                     {
                         _invites[request.Value.Token].Status = InviteStatus.REJECTED;
-                        Invite inv = _invites[request.Value.Token];
+                        var inv = _invites[request.Value.Token];
                         server.Send(new ValueResult<Invite>((int)MessageType.ACCEPT_INVITE,
                             inv.From, inv));
                         server.Send(new ValueResult<Invite>((int)MessageType.ACCEPT_INVITE,

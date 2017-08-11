@@ -5,11 +5,10 @@ namespace FootballClient
 {
     class Program
     {
-        static MMClient client;
+        static MMClient client = new MMClient(Token.Generate());
 
         static void Main(string[] args)
         {
-            var client = new MMClient(Token.Generate());
             client.Connect(IPAddress.Parse("127.0.0.1"), 8001);
 
             client.OnInviteAccepted = System.Console.WriteLine;
