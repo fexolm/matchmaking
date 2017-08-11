@@ -39,10 +39,11 @@ namespace FootballServer
                     {
                         _invites[request.Value].Status = InviteStatus.ACCEPTED;
                         Invite inv = _invites[request.Value];
-                        server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
-                            inv.To, Token.Generate()));
-                        server.Send(new ValueResult<Token>((int)InviteStatus.ACCEPTED,
-                            inv.From, Token.Generate()));
+                        var token = Token.Generate();
+                        server.Send(new ValueResult<Token>((int)MessageType.ACCEPT_INVITE,
+                            inv.To, token));
+                        server.Send(new ValueResult<Token>((int)MessageType.ACCEPT_INVITE,
+                            inv.From, token));
                         _invites.TryRemove(request.Value, out inv);
                     }
                     else
@@ -58,7 +59,7 @@ namespace FootballServer
                     {
                         _invites[request.Value.Token].Status = InviteStatus.REJECTED;
                         Invite inv = _invites[request.Value.Token];
-                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                        server.Send(new ValueResult<Invite>((int)MessageType.REJECT_INVITE,
                             inv.From, inv));
                         _invites.TryRemove(request.Value.Token, out inv);
                     }
@@ -75,9 +76,9 @@ namespace FootballServer
                     {
                         _invites[request.Value.Token].Status = InviteStatus.REJECTED;
                         Invite inv = _invites[request.Value.Token];
-                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                        server.Send(new ValueResult<Invite>((int)MessageType.ACCEPT_INVITE,
                             inv.From, inv));
-                        server.Send(new ValueResult<Invite>((int)InviteStatus.REJECTED,
+                        server.Send(new ValueResult<Invite>((int)MessageType.ACCEPT_INVITE,
                             inv.To, inv));
                         _invites.TryRemove(request.Value.Token, out inv);
                     }

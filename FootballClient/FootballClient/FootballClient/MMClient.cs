@@ -26,6 +26,7 @@ namespace FootballClient
                 {
                     var result = msg.ToObject<ValueResult<Invite>>();
                     OnInviteRecieved(result.Value);
+                    
                 }));
             AddHandler((int)MessageType.ACCEPT_INVITE,
                 (msg) => Task.Run(() =>

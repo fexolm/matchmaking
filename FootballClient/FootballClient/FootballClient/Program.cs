@@ -1,27 +1,31 @@
 ﻿using System.Net;
+using System.Timers;
 
 namespace FootballClient
 {
     class Program
     {
+        static MMClient client;
+
         static void Main(string[] args)
         {
-            var token = Token.Generate();
-            MMClient Ars = new MMClient(token);
-            Ars.Connect(IPAddress.Parse("127.0.0.1"), 8001);
-            int id = System.Convert.ToInt32(System.Console.ReadLine());
-            Ars.Send(id, token);
+            var client = new MMClient(Token.Generate());
+            client.Connect(IPAddress.Parse("127.0.0.1"), 8001);
 
-            Ars.OnInviteError = System.Console.WriteLine;
-            Ars.OnInviteAccepted = System.Console.WriteLine;
-            Ars.OnInviteRejected = System.Console.WriteLine;
-            Ars.OnInviteRecieved = System.Console.WriteLine;
+            client.OnInviteAccepted = System.Console.WriteLine;
+            client.OnInviteRejected = System.Console.WriteLine;
+            client.OnInviteRecieved = System.Console.WriteLine;
+            client.OnInviteError = System.Console.WriteLine;
 
-            while (true)
-            {
-                System.Threading.Thread.Sleep(100);
-                Ars.Tick();
-            }
+            var timer = new Timer();
+            timer.Interval = 100;
+            timer.Elapsed += new ElapsedEventHandler(Tick);
+            timer.Enabled = true;
+        }
+
+        static void Tick(object sender, ElapsedEventArgs args)
+        {
+            client.Tick();
         }
     }
 }
