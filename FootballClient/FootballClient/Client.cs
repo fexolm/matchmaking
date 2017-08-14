@@ -1,9 +1,7 @@
-﻿using FootballClient.Models.Requests;
-using FootballClient.Models.Results;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,19 +11,16 @@ namespace FootballClient
 {
     class Client
     {
-        protected readonly TcpClient _client;
-
-        protected readonly Token _token;
+        private readonly TcpClient _client;
 
         public delegate Task Handler(JObject msg);
 
-        public readonly ConcurrentDictionary<int, Handler> _handlers =
-            new ConcurrentDictionary<int, Handler>();
+        public readonly Dictionary<int, Handler> _handlers =
+            new Dictionary<int, Handler>();
 
-        public Client(Token token)
+        public Client()
         {
             _client = new TcpClient();
-            _token = token;
         }
 
         public void Tick()
@@ -68,26 +63,17 @@ namespace FootballClient
 
         public void Disconnect()
         {
-            _client.GetStream().Dispose();
+            _client.Close();
         }
 
         public void AddHandler(int id, Handler handler)
         {
-            _handlers.TryAdd(id, handler);
+            _handlers.Add(id, handler);
         }
 
-        public void Send(int id)
+        public void Send(Message msg)
         {
-            var m = JsonConvert.SerializeObject(
-                new Message(id, new Player(_token.ToString(), _client)));
-            var buffer = Encoding.UTF8.GetBytes(m);
-            _client.GetStream().Write(buffer, 0, buffer.Length);
-        }
-
-        public void Send<TValue>(int id, TValue Value)
-        {
-            var m = JsonConvert.SerializeObject(
-                new ValueRequest<TValue>(id, new Player(_token.ToString(), _client), Value));
+            var m = JsonConvert.SerializeObject(msg);
             var buffer = Encoding.UTF8.GetBytes(m);
             _client.GetStream().Write(buffer, 0, buffer.Length);
         }

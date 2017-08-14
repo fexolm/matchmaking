@@ -1,4 +1,5 @@
 ﻿using FootballClient.Enums;
+using FootballClient.Models.Requests;
 using FootballClient.Models.Results;
 using System;
 using System.Collections.Concurrent;
@@ -8,6 +9,8 @@ namespace FootballClient
 {
     class MMClient : Client
     {
+        private readonly Token _token;
+
         private ConcurrentDictionary<Player, Invite> _invites =
             new ConcurrentDictionary<Player, Invite>();
 
@@ -19,8 +22,10 @@ namespace FootballClient
 
         public Action<string> OnInviteError;
 
-        public MMClient(Token token) : base(token)
+        public MMClient(Token token) : base()
         {
+            _token = new Token();
+
             AddHandler((int)MessageType.RECIEVED_INVITE,
                 (msg) => Task.Run(() =>
                 {
@@ -50,17 +55,20 @@ namespace FootballClient
 
         public void CreateInvite(Token token)
         {
-            Send((int)MessageType.CREATE_INVITE, _token);
+            Send(new ValueRequest<Token>((int)MessageType.CREATE_INVITE, 
+                new Player(_token.ToString()), _token));
         }
 
         public void AcceptInvite(Invite invite)
         {
-            Send((int)MessageType.ACCEPT_INVITE, invite);
+            Send(new ValueRequest<Invite>((int)MessageType.ACCEPT_INVITE,
+                new Player(_token.ToString()), invite));
         }
 
         public void DeclineInvite(Invite invite)
         {
-            Send((int)MessageType.DECLINE_INVITE, invite);
+            Send(new ValueRequest<Invite>((int)MessageType.DECLINE_INVITE,
+                new Player(_token.ToString()), invite));
         }
     }
 }

@@ -63,11 +63,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MatchmakingServer\matchmaking.csproj">
+    <ProjectReference Include="..\..\MatchmakingServer\matchmaking.csproj">
       <Project>{6d6465ea-8baa-440b-8007-6f0d87c5ddd0}</Project>
       <Name>matchmaking</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
