@@ -91,7 +91,7 @@ namespace HistoryBattlesServer
 			};
 			RoomManager.playerJoined = (owner, oponent) =>
 			{
-				s.Send(new PlayerJoinedResponse(owner, Result.Ok, oponent.Token));
+				s.Send(new Response((int)MessageType.PLAYER_JOINED, owner, ValueResult<string>.BuildResult(true, oponent.Token)));
 			};
 			RoomManager.roomClosed = (opponent) =>
 			{

@@ -25,13 +25,14 @@ namespace HistoryBattlesServer.Rooms
             var room = _rooms[player.RoomToken];
             if (IsOwner(player)) {
                 if (RoomFull(player)) roomClosed.Invoke(room.Other);
-                if (room.Other != null) room.Other.RoomToken = null;
+                if (room.Other != null) room.Other.RoomToken = string.Empty;
                 RemoveRoom(player.RoomToken);
             }
             else {
                 opponentLeaved.Invoke(room.Owner);
                 room.Other = null;
             }
+            player.RoomToken = string.Empty;
         }
 
         public static Room RemoveRoom(string roomToken) {

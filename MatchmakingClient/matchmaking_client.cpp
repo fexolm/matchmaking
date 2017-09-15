@@ -73,9 +73,9 @@ void matchmaking_client::set_on_game_started(matchmaking_client::ip_response_han
     });
 }
 
-void matchmaking_client::set_on_opponent_leaved(matchmaking_client::token_response_handler_t handler) {
+void matchmaking_client::set_on_opponent_leaved(matchmaking_client::response_handler_t handler) {
     add_handler(OPPONENT_LEAVED, [handler](int id, const ptree_t &pt) {
-        token_response resp;
+        response resp;
         resp.deserialize(pt);
         handler(resp);
     });

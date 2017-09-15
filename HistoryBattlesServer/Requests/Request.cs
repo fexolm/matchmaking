@@ -39,8 +39,6 @@ namespace HistoryBattlesServer.Requests
             Value = val;
         }
 
-        public ValueResult(string errorMessage) : base(errorMessage) { }
-
         public static ValueResult<TValue> BuildResult(bool success, TValue value) {
             return new ValueResult<TValue> {
                 Success = success,
