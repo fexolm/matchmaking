@@ -22,6 +22,7 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static void LeaveRoom(HBPlayer player) {
+            if (!IsInRoom(player)) return;
             var room = _rooms[player.RoomToken];
             if (IsOwner(player)) {
                 if (RoomFull(player)) roomClosed.Invoke(room.Other);
@@ -36,25 +37,29 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static Room RemoveRoom(string roomToken) {
+            if (roomToken == null) return null;
             _rooms.TryRemove(roomToken, out Room removableRoom);
             return removableRoom;
         }
 
         public static bool IsInRoom(HBPlayer player) {
+            if (player == null) return false;
             return player.RoomToken != string.Empty;
         }
 
         public static bool IsInRoom(HBPlayer player, string roomToken) {
+            if (player?.RoomToken == null) return false;
             return player.RoomToken == roomToken;
         }
 
         public static bool IsOwner(HBPlayer player) {
-            if (!_rooms.ContainsKey(player.RoomToken))
+            if (player == null || !_rooms.ContainsKey(player.RoomToken))
                 return false;
             return _rooms[player.RoomToken].Owner == player;
         }
 
         public static bool RoomFull(HBPlayer player) {
+            if (player?.RoomToken == null) return false;
             if (!_rooms.ContainsKey(player.RoomToken))
                 return false;
             var room = _rooms[player.RoomToken];
@@ -62,6 +67,7 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static Room GetRoomInfo(string roomToken) {
+            if (roomToken == null) return null;
             return _rooms.ContainsKey(roomToken)
                 ? _rooms[roomToken]
                 : null;

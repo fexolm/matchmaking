@@ -4,8 +4,6 @@
 
 #include "client.h"
 
-#include <iostream>
-
 client::client() :
         ios_(),
         socket_(ios_),
@@ -56,8 +54,6 @@ void client::tick() {
         socket_.read_some(boost::asio::buffer(buf));
         std::string msgFull;
         std::copy(buf.begin(), buf.end(), std::back_inserter(msgFull));
-
-        std::cout << msgFull << std::endl;
         std::string msg = read_one_json(msgFull);
         std::istringstream st(msg);
         boost::property_tree::ptree pt;

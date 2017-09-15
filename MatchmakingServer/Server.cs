@@ -99,7 +99,6 @@ namespace matchmaking
             if (!str.Contains("{")) {
                 str = string.Empty;
             }
-            Console.WriteLine(res);
             return res;
         }
 
@@ -130,10 +129,10 @@ namespace matchmaking
                 .ToList();
 
             foreach (var client in toRemove) {
+                if (client == null || !_players.ContainsKey(client)) continue;
                 _players.TryRemove(client, out TPlayer player);
                 player?.OnLeave?.Invoke();
                 player?.Client?.Close();
-                //TODO: handle player disconnect
             }
             var tasks = _players
                 .Select(player => Task.Run(async () => { await HandleConnectionAsync(player.Key); }))
