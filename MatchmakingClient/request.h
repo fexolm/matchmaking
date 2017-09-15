@@ -21,10 +21,9 @@ public:
 
     virtual boost::property_tree::ptree serialize() override {
         auto pt = message::serialize();
-        pt.put("Token", token_);
+        pt.put("RoomToken", token_);
         return pt;
     }
-
 };
 
 #endif //MATCHMAKINGCLIENT_REQUEST_H

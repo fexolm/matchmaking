@@ -50,7 +50,7 @@ std::string read_one_json(std::string &str) {
 void client::tick() {
     if (socket_.available()) {
         boost::array<char, 1024> buf;
-        size_t len = socket_.read_some(boost::asio::buffer(buf));
+        socket_.read_some(boost::asio::buffer(buf));
         std::string msgFull;
         std::copy(buf.begin(), buf.end(), std::back_inserter(msgFull));
 

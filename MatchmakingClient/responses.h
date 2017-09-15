@@ -77,6 +77,7 @@ public:
     virtual void deserialize(const boost::property_tree::ptree &pt) override {
         response::deserialize(pt);
         int count = pt.get<int>("Count");
+        if(count == 0) return;
         //@formatter:off
         BOOST_FOREACH(const boost::property_tree::ptree::value_type &tree_node_value, pt.get_child("Result.Value")) {
             const boost::property_tree::ptree subtree = (boost::property_tree::ptree) tree_node_value.second;
