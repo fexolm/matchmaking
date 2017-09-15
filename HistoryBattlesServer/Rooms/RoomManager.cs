@@ -15,15 +15,6 @@ namespace HistoryBattlesServer.Rooms
             player.RoomToken = player.Token;
         }
 
-        public static void CloseRoom(HBPlayer player) {
-            Room room;
-            _rooms.TryRemove(player.Token, out room);
-			if(RoomFull(player)) { 
-				roomClosed.Invoke(room.Other);
-			}
-            player.RoomToken = string.Empty;
-        }
-
         public static void JoinRoom(HBPlayer player, string roomToken) {
             _rooms[roomToken].Other = player;
             playerJoined.Invoke(_rooms[roomToken].Owner, player);
@@ -32,17 +23,19 @@ namespace HistoryBattlesServer.Rooms
 
         public static void LeaveRoom(HBPlayer player) {
             var room = _rooms[player.RoomToken];
-            room.Other = null;
-            opponentLeaved.Invoke(room.Owner);
-            room.Owner.RoomToken = string.Empty;
-            if (room.Other != null) {
-                room.Other.RoomToken = string.Empty;
+            if (IsOwner(player)) {
+                if (RoomFull(player)) roomClosed.Invoke(room.Other);
+                if (room.Other != null) room.Other.RoomToken = null;
+                RemoveRoom(player.RoomToken);
+            }
+            else {
+                opponentLeaved.Invoke(room.Owner);
+                room.Other = null;
             }
         }
 
         public static Room RemoveRoom(string roomToken) {
-            Room removableRoom;
-            _rooms.TryRemove(roomToken, out removableRoom);
+            _rooms.TryRemove(roomToken, out Room removableRoom);
             return removableRoom;
         }
 
