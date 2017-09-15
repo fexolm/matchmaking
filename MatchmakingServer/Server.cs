@@ -36,14 +36,13 @@ namespace matchmaking
                 while (true) {
                     var tcpClient = await _listener.AcceptTcpClientAsync();
                     Console.WriteLine("[Server] Client has connected");
-                    var task = StartHandleConnectionAsync(tcpClient);
-                    if (task.IsFaulted)
-                        task.Wait();
+                    StartHandleConnection(tcpClient);
                 }
+                // ReSharper disable once FunctionNeverReturns
             });
         }
 
-        private async Task StartHandleConnectionAsync(TcpClient tcpClient) {
+        private void StartHandleConnection(TcpClient tcpClient) {
             try {
                 _players[tcpClient] = null;
             }
