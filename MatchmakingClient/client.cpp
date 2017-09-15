@@ -44,6 +44,12 @@ std::string read_one_json(std::string &str) {
     if (str.find("{") == std::string::npos) {
         str = EMPTY_STR;
     }
+
+#ifdef DEBUG
+    #include <iostream>
+    std::cout << result << std::endl;
+#endif
+
     return result;
 }
 

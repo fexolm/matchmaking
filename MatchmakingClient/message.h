@@ -4,7 +4,6 @@
 
 #ifndef MATCHMAKINGCLIENT_MESSAGE_H
 #define MATCHMAKINGCLIENT_MESSAGE_H
-
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/thread.hpp>
 #include "matchmaking_client.h"
-
+#define DEBUG
 int main() {
     std::string token;
     std::cin >> token;
