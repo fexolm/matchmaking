@@ -10,3 +10,4 @@ packages/
 *.exe
 *.dll
 .vs/
+.idea/

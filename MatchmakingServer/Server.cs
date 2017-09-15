@@ -14,8 +14,10 @@ namespace matchmaking
     public class Server<TPlayer>
         where TPlayer : Player, new()
     {
-        public ConcurrentDictionary<TcpClient, TPlayer> _players =
+        private readonly ConcurrentDictionary<TcpClient, TPlayer> _players =
             new ConcurrentDictionary<TcpClient, TPlayer>();
+
+        public IEnumerable<TPlayer> players => _players.Select(p => p.Value);
 
         public delegate Task Handler(TPlayer player, JObject msg, TcpClient client);
 
@@ -133,7 +135,6 @@ namespace matchmaking
                 player?.Client?.Close();
                 //TODO: handle player disconnect
             }
-            Console.WriteLine(_players.Count);
             var tasks = _players
                 .Select(player => Task.Run(async () => { await HandleConnectionAsync(player.Key); }))
                 .ToList();
