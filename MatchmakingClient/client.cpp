@@ -4,6 +4,8 @@
 
 #include "client.h"
 
+#include <iostream>
+
 client::client() :
         ios_(),
         socket_(ios_),
@@ -45,11 +47,6 @@ std::string read_one_json(std::string &str) {
         str = EMPTY_STR;
     }
 
-#ifdef DEBUG
-    #include <iostream>
-    std::cout << result << std::endl;
-#endif
-
     return result;
 }
 
@@ -60,14 +57,13 @@ void client::tick() {
         std::string msgFull;
         std::copy(buf.begin(), buf.end(), std::back_inserter(msgFull));
 
-        while (msgFull.length() > 0) {
-            std::string msg = read_one_json(msgFull);
-            std::istringstream st(msg);
-            boost::property_tree::ptree pt;
-            boost::property_tree::read_json(st, pt);
-            int id = pt.get<int>("Id");
-            handlers_[id](id, pt);
-        }
+        std::cout << msgFull << std::endl;
+        std::string msg = read_one_json(msgFull);
+        std::istringstream st(msg);
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(st, pt);
+        int id = pt.get<int>("Id");
+        handlers_[id](id, pt);
     }
 }
 

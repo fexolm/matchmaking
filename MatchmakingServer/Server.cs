@@ -99,6 +99,7 @@ namespace matchmaking
             if (!str.Contains("{")) {
                 str = string.Empty;
             }
+            Console.WriteLine(res);
             return res;
         }
 
