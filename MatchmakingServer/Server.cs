@@ -14,16 +14,12 @@ namespace matchmaking
     public class Server<TPlayer>
         where TPlayer : Player, new()
     {
-        public ConcurrentDictionary<string, TPlayer> _players =
-            new ConcurrentDictionary<string, TPlayer>();
-
-        public List<TcpClient> _clients =
-            new List<TcpClient>();
+        public ConcurrentDictionary<TcpClient, TPlayer> _players =
+            new ConcurrentDictionary<TcpClient, TPlayer>();
 
         public delegate Task Handler(TPlayer player, JObject msg, TcpClient client);
 
         private readonly TcpListener _listener;
-        private readonly object _lock = new object();
 
         private readonly Dictionary<int, Handler> _handlers = new Dictionary<int, Handler>();
 
@@ -46,9 +42,8 @@ namespace matchmaking
         }
 
         private async Task StartHandleConnectionAsync(TcpClient tcpClient) {
-            var connectionTask = HandleConnectionAsync(tcpClient);
             try {
-                await connectionTask;
+                _players[tcpClient] = null;
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
@@ -57,45 +52,38 @@ namespace matchmaking
 
         private Task HandleConnectionAsync(TcpClient tcpClient) {
             return Task.Run(async () => {
-                    using (var networkStream = tcpClient.GetStream()) {
-                        try {
-                            while (tcpClient.Connected) {
-                                int available;
-                                while ((available = tcpClient.Available) > 0) {
-                                    var buffer = new byte[available];
-                                    networkStream.Read(buffer, 0, buffer.Length);
-                                    var fullMsg = Encoding.UTF8.GetString(buffer);
-                                    while (!string.IsNullOrEmpty(fullMsg)) {
-                                        var msg = ReadOneJson(ref fullMsg);
-                                        var msgObj = JObject.FromObject(JsonConvert.DeserializeObject(msg));
-                                        var m = msgObj.ToObject<Message<TPlayer>>();
-                                        TPlayer player;
-                                        if (_players.ContainsKey(m.Player.Token)) {
-                                            player = _players[m.Player.Token];
-                                        }
-                                        else {
-                                            player = new TPlayer {
-                                                Token = m.Player.Token,
-                                                Client = tcpClient
-                                            };
-                                            _players[m.Player.Token] = player;
-                                        }
-                                        Debug.Assert(_handlers.ContainsKey(m.Id), $"_hanlers has key {m.Id}");
-                                        await _handlers[m.Id].Invoke(player, msgObj, tcpClient);
+                    var networkStream = tcpClient.GetStream();
+                    try {
+                        if (tcpClient.Connected) {
+                            int available;
+                            while ((available = tcpClient.Available) > 0) {
+                                var buffer = new byte[available];
+                                networkStream.Read(buffer, 0, buffer.Length);
+                                var fullMsg = Encoding.UTF8.GetString(buffer);
+                                while (!string.IsNullOrEmpty(fullMsg)) {
+                                    var msg = ReadOneJson(ref fullMsg);
+                                    var msgObj = JObject.FromObject(JsonConvert.DeserializeObject(msg));
+                                    var m = msgObj.ToObject<Message<TPlayer>>();
+                                    if (_players[tcpClient] == null) {
+                                        _players[tcpClient] = new TPlayer {
+                                            Token = m.Player.Token,
+                                            Client = tcpClient
+                                        };
                                     }
+                                    Debug.Assert(_handlers.ContainsKey(m.Id), $"_hanlers has key {m.Id}");
+                                    await _handlers[m.Id].Invoke(_players[tcpClient], msgObj, tcpClient);
                                 }
                             }
                         }
-                        catch (Exception e) {
-                            Console.WriteLine(e.Message);
-                        }
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
                     }
                 }
             );
         }
 
-        private string ReadOneJson(ref string str) {
-            str.Trim('\n');
+        private static string ReadOneJson(ref string str) {
             int bracketsCount = 0;
             int i = 0;
             do {
@@ -120,24 +108,36 @@ namespace matchmaking
         public void Send(Message<TPlayer> msg) {
             var m = JsonConvert.SerializeObject(msg);
             var buffer = Encoding.UTF8.GetBytes(m);
-            msg.Player.Client.GetStream().Write(buffer, 0, buffer.Length);
+            try {
+                msg.Player.Client.GetStream().Write(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex) {
+                // ignored
+            }
         }
 
-        public void Tick() {
-            lock (_clients) {
-                foreach (var client in _clients) {
-                    if (client.Client.Poll(0, SelectMode.SelectRead)) {
-                        byte[] buff = new byte[1];
-                        if (client.Client.Receive(buff, SocketFlags.Peek) == 0) {
-                            var player = _players.Values.FirstOrDefault(p => p.Client == client);
-                            if (player != null) {
-                                //TODO: handle player disconnect
-                            }
-                            _clients.Remove(client);
-                        }
-                    }
-                }
+        public Task Tick() {
+            var toRemove = (
+                    from player in _players
+                    select player.Key
+                    into client
+                    where client.Client.Poll(0, SelectMode.SelectRead)
+                    let buff = new byte[1]
+                    where client.Client.Receive(buff, SocketFlags.Peek) == 0
+                    select client)
+                .ToList();
+
+            foreach (var client in toRemove) {
+                _players.TryRemove(client, out TPlayer player);
+                player?.OnLeave?.Invoke();
+                player?.Client?.Close();
+                //TODO: handle player disconnect
             }
+            Console.WriteLine(_players.Count);
+            var tasks = _players
+                .Select(player => Task.Run(async () => { await HandleConnectionAsync(player.Key); }))
+                .ToList();
+            return Task.WhenAll(tasks);
         }
     }
 }

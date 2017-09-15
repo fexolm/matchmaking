@@ -1,4 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
+using Newtonsoft.Json;
 
 namespace matchmaking
 {
@@ -6,5 +8,7 @@ namespace matchmaking
     {
         public string Token { get; set; }
         internal TcpClient Client { get; set; }
+        [JsonIgnore]    
+        public Action OnLeave;
     }
 }

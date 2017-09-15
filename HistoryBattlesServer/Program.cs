@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Responses;
 using HistoryBattlesServer.Rooms;
@@ -96,6 +97,8 @@ namespace HistoryBattlesServer
 			{
 				s.Send(new Response((int)MessageType.ROOM_CLOSED, opponent, Result.Ok));
 			};
+			var t = new Timer((o) => { s.Tick().Wait(); });
+			t.Change(10, 10);
 			s.StartListener().Wait();
 		}
 	}

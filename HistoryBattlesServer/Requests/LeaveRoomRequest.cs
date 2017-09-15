@@ -13,12 +13,8 @@ namespace HistoryBattlesServer.Requests
         }
 
         public override Result Process() {
-            if (RoomManager.IsOwner(Player)) {
-                RoomManager.CloseRoom(Player);
-            }
-            else {
-                RoomManager.LeaveRoom(Player);
-            }
+            RoomManager.LeaveRoom(Player);
+            Player.OnLeave = null;
             return Result.Ok;
         }
     }
