@@ -17,7 +17,12 @@ namespace HistoryBattlesServer.ExternalServices
 
         //TODO: implement
         public static Result ValidateRoomParams(RoomParams roomParams, Player player) {
-            return Result.Ok;
+            var response = WebService.Post<dynamic, object>("http://35.195.58.247/api/mm", new {token = player.Token});
+            if (roomParams.Bet < response.money && roomParams.Rang == response.rank &&
+                roomParams.Fraction == response.fraction) {
+                return Result.Ok;
+            }
+            return new Result("Validation room params error");
         }
 
         //TODO: test
