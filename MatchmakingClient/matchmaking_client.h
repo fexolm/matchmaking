@@ -47,7 +47,7 @@ public:
 
     void set_on_game_started(ip_response_handler_t);
 
-    void set_on_opponent_leaved(token_response_handler_t);
+    void set_on_opponent_leaved(response_handler_t);
 
     void set_on_room_closed(response_handler_t);
 

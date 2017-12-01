@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$USER_HOME$/.Rider2017.2/system/resharper-host/local/Transient/ReSharperHost/v10/SolutionCaches/_HistoryBattlesServer.-1819518666.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeRecursive">
+      <e p="ExternalServices" t="Include">
+        <e p="ApiService.cs" t="Include" />
+        <e p="Models" t="Include">
+          <e p="IpResponse.cs" t="Include" />
+          <e p="StartGameRequest.cs" t="Include" />
+        </e>
+      </e>
+      <e p="HBPlayer.cs" t="Include" />
+      <e p="HistoryBattlesServer.csproj" t="IncludeRecursive" />
+      <e p="HistoryBattlesServer.sln" t="IncludeFlat" />
+      <e p="MessageType.cs" t="Include" />
+      <e p="Program.cs" t="Include" />
+      <e p="Properties" t="Include">
+        <e p="AssemblyInfo.cs" t="Include" />
+      </e>
+      <e p="Requests" t="Include">
+        <e p="CreateRoomRequest.cs" t="Include" />
+        <e p="JoinRoomRequest.cs" t="Include" />
+        <e p="LeaveRoomRequest.cs" t="Include" />
+        <e p="Request.cs" t="Include" />
+        <e p="ShowRoomsRequest.cs" t="Include" />
+        <e p="StartGameRequest.cs" t="Include" />
+      </e>
+      <e p="Responses" t="Include">
+        <e p="PlayerJoinedResponse.cs" t="Include" />
+        <e p="Response.cs" t="Include" />
+        <e p="RoomListResult.cs" t="Include" />
+        <e p="StartGameResponse.cs" t="Include" />
+      </e>
+      <e p="Rooms" t="Include">
+        <e p="Room.cs" t="Include" />
+        <e p="RoomManager.cs" t="Include" />
+        <e p="RoomParams.cs" t="Include" />
+      </e>
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="packages.config" t="Include" />
+    </e>
+    <e p="$PROJECT_DIR$/../MatchmakingServer" t="IncludeRecursive">
+      <e p="Message.cs" t="Include" />
+      <e p="Player.cs" t="Include" />
+      <e p="Properties" t="Include">
+        <e p="AssemblyInfo.cs" t="Include" />
+      </e>
+      <e p="Server.cs" t="Include" />
+      <e p="WebService.cs" t="Include" />
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="matchmaking.csproj" t="IncludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages.config" t="Include" />
+    </e>
+  </component>
+  <component name="RiderRiderContentModelStore">
+    <excludedPaths />
+  </component>
+</project>

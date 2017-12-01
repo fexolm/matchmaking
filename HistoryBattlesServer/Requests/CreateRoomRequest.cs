@@ -22,6 +22,7 @@ namespace HistoryBattlesServer.Requests
 
         public override Result Process() {
             RoomManager.CreateRoom(Player, RoomParams);
+            Player.OnLeave = () => RoomManager.LeaveRoom(Player);
             return Result.Ok;
         }
     }

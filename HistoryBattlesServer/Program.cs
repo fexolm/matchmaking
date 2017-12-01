@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Responses;
 using HistoryBattlesServer.Rooms;
@@ -90,12 +91,14 @@ namespace HistoryBattlesServer
 			};
 			RoomManager.playerJoined = (owner, oponent) =>
 			{
-				s.Send(new PlayerJoinedResponse(owner, Result.Ok, oponent.Token));
+				s.Send(new Response((int)MessageType.PLAYER_JOINED, owner, ValueResult<string>.BuildResult(true, oponent.Token)));
 			};
 			RoomManager.roomClosed = (opponent) =>
 			{
 				s.Send(new Response((int)MessageType.ROOM_CLOSED, opponent, Result.Ok));
 			};
+			var t = new Timer((o) => { s.Tick().Wait(); });
+			t.Change(10, 10);
 			s.StartListener().Wait();
 		}
 	}

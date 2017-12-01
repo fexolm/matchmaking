@@ -1,12 +1,12 @@
 #include <iostream>
 #include <boost/thread.hpp>
 #include "matchmaking_client.h"
-
+#define DEBUG
 int main() {
     std::string token;
     std::cin >> token;
     matchmaking_client c(token);
-    c.connect("192.168.0.102", 8001);
+    c.connect("127.0.0.1", 8001);
     bool end = false;
     std::string command;
 

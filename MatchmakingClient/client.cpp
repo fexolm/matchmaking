@@ -44,24 +44,22 @@ std::string read_one_json(std::string &str) {
     if (str.find("{") == std::string::npos) {
         str = EMPTY_STR;
     }
+
     return result;
 }
 
 void client::tick() {
     if (socket_.available()) {
         boost::array<char, 1024> buf;
-        size_t len = socket_.read_some(boost::asio::buffer(buf));
+        socket_.read_some(boost::asio::buffer(buf));
         std::string msgFull;
         std::copy(buf.begin(), buf.end(), std::back_inserter(msgFull));
-
-        while (msgFull.length() > 0) {
-            std::string msg = read_one_json(msgFull);
-            std::istringstream st(msg);
-            boost::property_tree::ptree pt;
-            boost::property_tree::read_json(st, pt);
-            int id = pt.get<int>("Id");
-            handlers_[id](id, pt);
-        }
+        std::string msg = read_one_json(msgFull);
+        std::istringstream st(msg);
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(st, pt);
+        int id = pt.get<int>("Id");
+        handlers_[id](id, pt);
     }
 }
 

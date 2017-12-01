@@ -15,15 +15,6 @@ namespace HistoryBattlesServer.Rooms
             player.RoomToken = player.Token;
         }
 
-        public static void CloseRoom(HBPlayer player) {
-            Room room;
-            _rooms.TryRemove(player.Token, out room);
-			if(RoomFull(player)) { 
-				roomClosed.Invoke(room.Other);
-			}
-            player.RoomToken = string.Empty;
-        }
-
         public static void JoinRoom(HBPlayer player, string roomToken) {
             _rooms[roomToken].Other = player;
             playerJoined.Invoke(_rooms[roomToken].Owner, player);
@@ -31,36 +22,44 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static void LeaveRoom(HBPlayer player) {
+            if (!IsInRoom(player)) return;
             var room = _rooms[player.RoomToken];
-            room.Other = null;
-            opponentLeaved.Invoke(room.Owner);
-            room.Owner.RoomToken = string.Empty;
-            if (room.Other != null) {
-                room.Other.RoomToken = string.Empty;
+            if (IsOwner(player)) {
+                if (RoomFull(player)) roomClosed.Invoke(room.Other);
+                if (room.Other != null) room.Other.RoomToken = string.Empty;
+                RemoveRoom(player.RoomToken);
             }
+            else {
+                opponentLeaved.Invoke(room.Owner);
+                room.Other = null;
+            }
+            player.RoomToken = string.Empty;
         }
 
         public static Room RemoveRoom(string roomToken) {
-            Room removableRoom;
-            _rooms.TryRemove(roomToken, out removableRoom);
+            if (roomToken == null) return null;
+            _rooms.TryRemove(roomToken, out Room removableRoom);
             return removableRoom;
         }
 
         public static bool IsInRoom(HBPlayer player) {
+            if (player == null) return false;
             return player.RoomToken != string.Empty;
         }
 
         public static bool IsInRoom(HBPlayer player, string roomToken) {
+            if (player?.RoomToken == null) return false;
             return player.RoomToken == roomToken;
         }
 
         public static bool IsOwner(HBPlayer player) {
-            if (!_rooms.ContainsKey(player.RoomToken))
+            if (player == null || !_rooms.ContainsKey(player.RoomToken))
                 return false;
             return _rooms[player.RoomToken].Owner == player;
         }
 
         public static bool RoomFull(HBPlayer player) {
+            if (player?.RoomToken == null) return false;
             if (!_rooms.ContainsKey(player.RoomToken))
                 return false;
             var room = _rooms[player.RoomToken];
@@ -68,6 +67,7 @@ namespace HistoryBattlesServer.Rooms
         }
 
         public static Room GetRoomInfo(string roomToken) {
+            if (roomToken == null) return null;
             return _rooms.ContainsKey(roomToken)
                 ? _rooms[roomToken]
                 : null;

@@ -3,7 +3,10 @@ using HistoryBattlesServer.ExternalServices.Models;
 using HistoryBattlesServer.Requests;
 using HistoryBattlesServer.Rooms;
 using matchmaking;
+using System.Linq;
+using System.Collections.Generic;
 using StartGameRequest = HistoryBattlesServer.ExternalServices.Models.StartGameRequest;
+using System.Collections;
 
 namespace HistoryBattlesServer.ExternalServices
 {
@@ -14,10 +17,14 @@ namespace HistoryBattlesServer.ExternalServices
 
         //TODO: change private key
         private const string PRIVATE_KEY = "12345";
-
         //TODO: implement
         public static Result ValidateRoomParams(RoomParams roomParams, Player player) {
-            return Result.Ok;
+            var response = WebService.Post<dynamic, object>("http://35.195.58.247/api/mm", new {token = player.Token});
+            if (response.info != null && roomParams.Bet < response.info.money.Value && roomParams.Rang == response.info.rank.Value &&
+                ((IEnumerable<string>)(response.info.fractions.Value.Split(','))).Any(f => f == roomParams.Fraction)) {
+                return Result.Ok;
+            }
+            return new Result("Validation room params error");
         }
 
         //TODO: test
